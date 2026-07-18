@@ -133,6 +133,15 @@ const curatedCategories = {
       ]
     }
   ],
+  product: [
+    {
+      name: "コスメパッケージ",
+      items: [
+        item("package-metallic", "メタル箱とガラスボトル", "0wgkf4urY7o", ["コスメパッケージ", "ガラスボトル", "メタルボックス", "高級感", "商品モックアップ"]),
+        item("package-matte-black", "マットブラック容器", "58S0r8WeVYg", ["コスメ容器", "マットブラック", "ボトル", "ミニマルラベル", "暗い背景"])
+      ]
+    }
+  ],
   fashion: [
     {
       name: "ゴシック",
@@ -194,6 +203,32 @@ const curatedCategories = {
         item("boho-sun", "日差し植物", "HVUSherHy74", ["日差しの入る部屋", "茶色の革ソファ", "豊かな観葉植物", "木のテーブル", "暖かな雰囲気"]),
         item("boho-terrace", "テラスビュー", "jAs-pBgmuww", ["ボヘミアンテラス", "ドライ植物", "屋外の眺望", "木製ダイニング", "リゾート感"]),
         item("boho-urban-jungle", "植物のアーバンジャングル", "xALgQ6VC8ps", ["ボヘミアンリビング", "豊かな観葉植物", "木製テーブル", "都市の住まい", "有機的な雰囲気"])
+      ]
+    }
+  ],
+  social: [
+    {
+      name: "SNSフィード",
+      items: [
+        item("social-feed-hand", "手持ちSNSフィード", "9jCeCFGnnzg", ["SNS投稿", "スマートフォン", "フィード画面", "コンテンツ制作", "縦型レイアウト"]),
+        item("social-story", "ストーリー画面", "GPJwAHd8maE", ["SNSストーリー", "スマートフォン", "縦長画面", "ブランド発信", "デジタルコンテンツ"])
+      ]
+    }
+  ],
+  landing: [
+    {
+      name: "Webページ",
+      items: [
+        item("landing-screen", "Webページのモニター表示", "LWFdfx-5oEE", ["ランディングページ", "Webデザイン", "デスクトップ画面", "情報レイアウト", "デジタルプロダクト"])
+      ]
+    }
+  ],
+  slide: [
+    {
+      name: "プレゼンテーション",
+      items: [
+        item("slide-laptop", "ノートPCのスライド", "J4LeErSKC_0", ["プレゼンテーション", "スライド一覧", "ノートPC", "制作画面", "グラフィックデザイン"]),
+        item("slide-stage", "会場の投影スライド", "xeEukPZjZi0", ["プレゼンテーション", "プロジェクター", "大画面スライド", "講演会場", "聴衆"])
       ]
     }
   ]
