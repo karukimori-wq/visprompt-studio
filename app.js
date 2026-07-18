@@ -4,6 +4,7 @@ const state = {
   activeType: null,
   activeCategory: null,
   selected: new Map(),
+  searchQuery: "",
   promptExpanded: true
 };
 
@@ -18,6 +19,7 @@ const elements = {
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
+  itemSearch: document.querySelector("#itemSearch"),
   charCount: document.querySelector("#charCount"),
   copyButton: document.querySelector("#copyButton"),
   resetButton: document.querySelector("#resetButton"),
@@ -28,6 +30,16 @@ const elements = {
   toast: document.querySelector("#toast"),
   stepPill: document.querySelector("#stepPill")
 };
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[character]);
+}
 
 function renderTypes() {
   elements.typeGrid.innerHTML = VIS_PROMPT_TYPES.map(
@@ -52,7 +64,9 @@ function chooseType(typeId) {
   if (!state.activeType?.categories.length) return;
   state.activeCategory = state.activeType.categories[0].id;
   state.selected.clear();
+  state.searchQuery = "";
   elements.subjectInput.value = "";
+  elements.itemSearch.value = "";
   elements.typeSection.classList.add("hidden");
   elements.builderSection.classList.remove("hidden");
   elements.activeTypeLabel.textContent = state.activeType.name.toUpperCase();
@@ -76,6 +90,8 @@ function renderCategories() {
   elements.categoryTabs.querySelectorAll("[data-category]").forEach((button) => {
     button.addEventListener("click", () => {
       state.activeCategory = button.dataset.category;
+      state.searchQuery = "";
+      elements.itemSearch.value = "";
       renderCategories();
       renderGallery();
     });
@@ -83,6 +99,10 @@ function renderCategories() {
 }
 
 function renderGallery() {
+  if (state.searchQuery) {
+    renderSearchResults();
+    return;
+  }
   const category = state.activeType.categories.find((item) => item.id === state.activeCategory);
   elements.gallery.innerHTML = `
     <div class="gallery-heading">
@@ -103,6 +123,46 @@ function renderGallery() {
         </button>
       `).join("")}
     </div>
+  `;
+
+  elements.gallery.querySelectorAll("[data-item]").forEach((button) => {
+    button.addEventListener("click", () => toggleItem(button.dataset.item));
+  });
+  elements.gallery.querySelectorAll("img").forEach((image) => {
+    image.addEventListener("error", () => image.closest(".image-wrap").classList.add("image-error"));
+  });
+}
+
+function renderSearchResults() {
+  const query = state.searchQuery.toLocaleLowerCase("ja");
+  const results = state.activeType.categories.flatMap((category) =>
+    category.items
+      .filter((item) => `${category.name} ${item.label}`.toLocaleLowerCase("ja").includes(query))
+      .map((item) => ({ ...item, categoryName: category.name }))
+  );
+
+  elements.gallery.innerHTML = `
+    <div class="gallery-heading">
+      <h2>「${escapeHtml(state.searchQuery)}」の検索結果</h2>
+      <p>${results.length}件</p>
+    </div>
+    ${results.length ? `
+      <div class="image-grid">
+        ${results.map((item) => `
+          <button class="image-card ${state.selected.has(item.id) ? "selected" : ""}"
+            type="button" data-item="${item.id}" aria-pressed="${state.selected.has(item.id)}">
+            <span class="image-wrap ${item.image ? "" : "no-image"}">
+              ${item.image
+                ? `<img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />`
+                : `<span class="no-image-label"><span aria-hidden="true">◇</span>画像未設定</span>`}
+              <span class="checkmark">✓</span>
+            </span>
+            <span class="image-category">${item.categoryName}</span>
+            <span class="image-label">${item.label}</span>
+          </button>
+        `).join("")}
+      </div>
+    ` : '<div class="search-empty">該当するアイテムがありません。別の言葉で検索してください。</div>'}
   `;
 
   elements.gallery.querySelectorAll("[data-item]").forEach((button) => {
@@ -197,6 +257,8 @@ function updatePrompt() {
 function resetSelections() {
   state.selected.clear();
   elements.subjectInput.value = "";
+  state.searchQuery = "";
+  elements.itemSearch.value = "";
   if (state.activeType) {
     renderCategories();
     renderGallery();
@@ -232,6 +294,10 @@ function returnToTypes() {
 }
 
 elements.subjectInput.addEventListener("input", updatePrompt);
+elements.itemSearch.addEventListener("input", () => {
+  state.searchQuery = elements.itemSearch.value.trim();
+  renderGallery();
+});
 elements.promptOutput.addEventListener("input", () => {
   elements.charCount.textContent = `${elements.promptOutput.value.length}文字`;
   elements.copyButton.disabled = !elements.promptOutput.value.trim();
