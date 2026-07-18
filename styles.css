@@ -262,6 +262,19 @@ button { color: inherit; }
   transition: border-color .2s, box-shadow .2s;
 }
 .subject-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); background: white; }
+.item-search-field { display: block; margin: -8px 0 18px; }
+.item-search-field > span { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
+.item-search-field input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  background: white;
+  font-size: 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.item-search-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .category-tabs {
   display: flex;
   gap: 8px;
@@ -347,6 +360,25 @@ button { color: inherit; }
 }
 .image-card.selected .checkmark { background: var(--accent); color: white; }
 .image-label { display: block; margin: 9px 3px 0; font-size: 12px; font-weight: 600; line-height: 1.5; }
+.image-category {
+  display: inline-block;
+  margin: 8px 3px 0;
+  padding: 3px 7px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 8px;
+  font-weight: 700;
+}
+.image-category + .image-label { margin-top: 4px; }
+.search-empty {
+  padding: 34px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+}
 
 .prompt-panel {
   position: sticky;
