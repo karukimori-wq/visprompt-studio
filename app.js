@@ -32,13 +32,12 @@ const elements = {
 function renderTypes() {
   elements.typeGrid.innerHTML = VIS_PROMPT_TYPES.map(
     (type, index) => `
-      <button class="type-card ${type.available ? "" : "unavailable"}" type="button" data-type="${type.id}"
-        ${type.available ? "" : "disabled"} aria-label="${type.name}${type.available ? "" : "（画像準備中）"}">
+      <button class="type-card" type="button" data-type="${type.id}" aria-label="${type.name}">
         <span class="type-number">${String(index + 1).padStart(2, "0")}</span>
         <span class="type-icon" aria-hidden="true">${type.icon}</span>
         <span class="type-name">${type.name}</span>
-        <span class="type-description">${type.available ? type.description : "画像準備中"}</span>
-        <span class="type-arrow" aria-hidden="true">${type.available ? "↗" : "…"}</span>
+        <span class="type-description">${type.description}</span>
+        <span class="type-arrow" aria-hidden="true">↗</span>
       </button>
     `
   ).join("");
@@ -50,7 +49,7 @@ function renderTypes() {
 
 function chooseType(typeId) {
   state.activeType = VIS_PROMPT_TYPES.find((type) => type.id === typeId);
-  if (!state.activeType?.available || !state.activeType.categories.length) return;
+  if (!state.activeType?.categories.length) return;
   state.activeCategory = state.activeType.categories[0].id;
   state.selected.clear();
   elements.subjectInput.value = "";
@@ -94,8 +93,10 @@ function renderGallery() {
       ${category.items.map((item) => `
         <button class="image-card ${state.selected.has(item.id) ? "selected" : ""}"
           type="button" data-item="${item.id}" aria-pressed="${state.selected.has(item.id)}">
-          <span class="image-wrap">
-            <img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />
+          <span class="image-wrap ${item.image ? "" : "no-image"}">
+            ${item.image
+              ? `<img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />`
+              : `<span class="no-image-label"><span aria-hidden="true">◇</span>画像未設定</span>`}
             <span class="checkmark">✓</span>
           </span>
           <span class="image-label">${item.label}</span>
