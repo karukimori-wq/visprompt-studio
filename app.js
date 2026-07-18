@@ -13,6 +13,7 @@ const elements = {
   builderSection: document.querySelector("#builderSection"),
   typeGrid: document.querySelector("#typeGrid"),
   categoryTabs: document.querySelector("#categoryTabs"),
+  categorySelect: document.querySelector("#categorySelect"),
   gallery: document.querySelector("#gallery"),
   activeTypeLabel: document.querySelector("#activeTypeLabel"),
   selectionCount: document.querySelector("#selectionCount"),
@@ -87,15 +88,23 @@ function renderCategories() {
     </button>
   `).join("");
 
+  elements.categorySelect.innerHTML = state.activeType.categories.map((category) => `
+    <option value="${category.id}" ${category.id === state.activeCategory ? "selected" : ""}>
+      ${category.name}（${countCategorySelections(category.id)}）
+    </option>
+  `).join("");
+
   elements.categoryTabs.querySelectorAll("[data-category]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.activeCategory = button.dataset.category;
-      state.searchQuery = "";
-      elements.itemSearch.value = "";
-      renderCategories();
-      renderGallery();
-    });
+    button.addEventListener("click", () => chooseCategory(button.dataset.category));
   });
+}
+
+function chooseCategory(categoryId) {
+  state.activeCategory = categoryId;
+  state.searchQuery = "";
+  elements.itemSearch.value = "";
+  renderCategories();
+  renderGallery();
 }
 
 function renderGallery() {
@@ -298,6 +307,7 @@ elements.itemSearch.addEventListener("input", () => {
   state.searchQuery = elements.itemSearch.value.trim();
   renderGallery();
 });
+elements.categorySelect.addEventListener("change", () => chooseCategory(elements.categorySelect.value));
 elements.promptOutput.addEventListener("input", () => {
   elements.charCount.textContent = `${elements.promptOutput.value.length}文字`;
   elements.copyButton.disabled = !elements.promptOutput.value.trim();
