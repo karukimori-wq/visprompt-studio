@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6558f5" />
+    <meta
+      name="description"
+      content="参考画像を選ぶだけで画像生成AI向けプロンプトを組み立てられるツール"
+    />
+    <title>VisPrompt Studio</title>
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="VisPrompt Studio ホーム">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <span>
+          <strong>VisPrompt</strong>
+          <small>Studio</small>
+        </span>
+      </a>
+      <div class="header-meta">
+        <span class="step-pill" id="stepPill">STEP 1 / 3</span>
+        <button class="icon-button" id="headerReset" type="button" aria-label="選択をリセット" title="リセット">
+          ↻
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="typeSection">
+        <div class="eyebrow">VISUAL PROMPT BUILDER</div>
+        <h1>見て、選んで、<br /><span>プロンプトにする。</span></h1>
+        <p>言葉にしづらいイメージも、好きなビジュアルを選ぶだけ。画像生成AIに伝わる指示へ整えます。</p>
+        <div class="step-heading">
+          <span>01</span>
+          <div>
+            <h2>何を作りたいですか？</h2>
+            <p>まずは制作タイプをひとつ選びます</p>
+          </div>
+        </div>
+        <div class="type-grid" id="typeGrid" aria-label="制作タイプ"></div>
+      </section>
+
+      <section class="builder hidden" id="builderSection">
+        <div class="builder-main">
+          <button class="back-button" id="backButton" type="button">← 制作タイプを変更</button>
+
+          <div class="builder-title-row">
+            <div>
+              <div class="eyebrow" id="activeTypeLabel"></div>
+              <h1>イメージを選ぶ</h1>
+              <p>気になる画像をタップ。複数のカテゴリーからいくつでも選べます。</p>
+            </div>
+            <div class="selection-count"><strong id="selectionCount">0</strong><span>SELECTED</span></div>
+          </div>
+
+          <label class="subject-field">
+            <span>作りたいもの・テーマ <em>任意</em></span>
+            <input id="subjectInput" type="text" placeholder="例：雨上がりの東京を歩く白い猫" maxlength="120" />
+          </label>
+
+          <nav class="category-tabs" id="categoryTabs" aria-label="カテゴリー"></nav>
+          <div class="gallery" id="gallery"></div>
+        </div>
+
+        <aside class="prompt-panel" aria-label="生成プロンプト">
+          <div class="prompt-panel-head">
+            <div>
+              <span class="panel-kicker">LIVE PROMPT</span>
+              <h2>生成プロンプト</h2>
+            </div>
+            <span class="live-dot">自動更新</span>
+          </div>
+          <div class="selected-chips" id="selectedChips"></div>
+          <label class="prompt-box">
+            <span class="sr-only">生成されたプロンプト</span>
+            <textarea id="promptOutput" rows="9" placeholder="画像を選ぶと、ここにプロンプトが生成されます。"></textarea>
+          </label>
+          <div class="prompt-stats">
+            <span id="charCount">0文字</span>
+            <span>日本語プロンプト</span>
+          </div>
+          <button class="copy-button" id="copyButton" type="button" disabled>
+            <span aria-hidden="true">▣</span> プロンプトをコピー
+          </button>
+          <button class="text-button" id="resetButton" type="button">すべての選択をリセット</button>
+        </aside>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">コピーしました</div>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
