@@ -331,10 +331,33 @@ button { color: inherit; }
   box-shadow: var(--shadow);
 }
 .prompt-panel-head { display: flex; align-items: flex-start; justify-content: space-between; }
+.prompt-panel-actions { display: flex; align-items: center; gap: 10px; }
 .panel-kicker { color: var(--accent); font-size: 9px; font-weight: 700; letter-spacing: .16em; }
 .prompt-panel h2 { margin: 4px 0 0; font-size: 21px; }
 .live-dot { color: #3b8d59; font-size: 10px; }
 .live-dot::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #52c77b; }
+.prompt-toggle {
+  min-width: 62px;
+  height: 34px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+.toggle-icon { font-size: 15px; line-height: 1; }
+.prompt-panel.collapsed { padding: 19px 20px; }
+.prompt-panel.collapsed .prompt-panel-body { display: none; }
+.prompt-panel.collapsed .prompt-panel-head { align-items: center; }
+.prompt-panel.collapsed .panel-kicker,
+.prompt-panel.collapsed .live-dot { display: none; }
+.prompt-panel.collapsed h2 { margin: 0; font-size: 15px; }
 .selected-chips { min-height: 47px; margin: 19px 0 12px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .selected-chips::-webkit-scrollbar { display: none; }
 .empty-selection { align-self: center; color: #aaa7b3; font-size: 11px; }
@@ -438,6 +461,34 @@ button { color: inherit; }
     border-width: 1px 0 0;
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -15px 40px rgba(31,25,77,.13);
+  }
+  body.prompt-collapsed .builder { padding-bottom: 118px; }
+  .prompt-panel.collapsed {
+    left: 16px;
+    right: 16px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    box-shadow: 0 10px 30px rgba(31,25,77,.16);
+  }
+  .prompt-panel.collapsed .prompt-panel-head { width: 100%; }
+  .prompt-panel.collapsed .prompt-toggle {
+    min-width: 142px;
+    height: 40px;
+    border: 0;
+    background: var(--accent);
+    color: white;
+  }
+  .prompt-panel.collapsed h2::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 8px;
+    border-radius: 50%;
+    background: #52c77b;
+    vertical-align: middle;
   }
   .prompt-panel-head h2 { font-size: 17px; }
   .selected-chips { min-height: 36px; margin: 11px 0 8px; }
