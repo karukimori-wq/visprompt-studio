@@ -207,6 +207,17 @@ button { color: inherit; }
   transition: background .2s, color .2s;
 }
 .type-card:hover .type-arrow { background: var(--accent); color: white; }
+.type-card.unavailable {
+  opacity: .5;
+  background: var(--soft);
+  cursor: not-allowed;
+}
+.type-card.unavailable:hover {
+  transform: none;
+  border-color: var(--line);
+  box-shadow: none;
+}
+.type-card.unavailable:hover .type-arrow { background: #eceaf1; color: var(--muted); }
 
 .builder {
   max-width: 1480px;
