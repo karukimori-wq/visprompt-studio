@@ -72,21 +72,29 @@
               <span class="panel-kicker">LIVE PROMPT</span>
               <h2>生成プロンプト</h2>
             </div>
-            <span class="live-dot">自動更新</span>
+            <div class="prompt-panel-actions">
+              <span class="live-dot">自動更新</span>
+              <button class="prompt-toggle" id="promptToggle" type="button" aria-expanded="true" aria-controls="promptPanelBody">
+                <span class="toggle-label">収納</span>
+                <span class="toggle-icon" aria-hidden="true">⌄</span>
+              </button>
+            </div>
           </div>
-          <div class="selected-chips" id="selectedChips"></div>
-          <label class="prompt-box">
-            <span class="sr-only">生成されたプロンプト</span>
-            <textarea id="promptOutput" rows="9" placeholder="画像を選ぶと、ここにプロンプトが生成されます。"></textarea>
-          </label>
-          <div class="prompt-stats">
-            <span id="charCount">0文字</span>
-            <span>日本語プロンプト</span>
+          <div class="prompt-panel-body" id="promptPanelBody">
+            <div class="selected-chips" id="selectedChips"></div>
+            <label class="prompt-box">
+              <span class="sr-only">生成されたプロンプト</span>
+              <textarea id="promptOutput" rows="9" placeholder="画像を選ぶと、ここにプロンプトが生成されます。"></textarea>
+            </label>
+            <div class="prompt-stats">
+              <span id="charCount">0文字</span>
+              <span>日本語プロンプト</span>
+            </div>
+            <button class="copy-button" id="copyButton" type="button" disabled>
+              <span aria-hidden="true">▣</span> プロンプトをコピー
+            </button>
+            <button class="text-button" id="resetButton" type="button">すべての選択をリセット</button>
           </div>
-          <button class="copy-button" id="copyButton" type="button" disabled>
-            <span aria-hidden="true">▣</span> プロンプトをコピー
-          </button>
-          <button class="text-button" id="resetButton" type="button">すべての選択をリセット</button>
         </aside>
       </section>
     </main>
