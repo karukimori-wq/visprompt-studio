@@ -32,12 +32,13 @@ const elements = {
 function renderTypes() {
   elements.typeGrid.innerHTML = VIS_PROMPT_TYPES.map(
     (type, index) => `
-      <button class="type-card" type="button" data-type="${type.id}">
+      <button class="type-card ${type.available ? "" : "unavailable"}" type="button" data-type="${type.id}"
+        ${type.available ? "" : "disabled"} aria-label="${type.name}${type.available ? "" : "（画像準備中）"}">
         <span class="type-number">${String(index + 1).padStart(2, "0")}</span>
         <span class="type-icon" aria-hidden="true">${type.icon}</span>
         <span class="type-name">${type.name}</span>
-        <span class="type-description">${type.description}</span>
-        <span class="type-arrow" aria-hidden="true">↗</span>
+        <span class="type-description">${type.available ? type.description : "画像準備中"}</span>
+        <span class="type-arrow" aria-hidden="true">${type.available ? "↗" : "…"}</span>
       </button>
     `
   ).join("");
@@ -49,6 +50,7 @@ function renderTypes() {
 
 function chooseType(typeId) {
   state.activeType = VIS_PROMPT_TYPES.find((type) => type.id === typeId);
+  if (!state.activeType?.available || !state.activeType.categories.length) return;
   state.activeCategory = state.activeType.categories[0].id;
   state.selected.clear();
   elements.subjectInput.value = "";
