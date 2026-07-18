@@ -3,7 +3,8 @@
 const state = {
   activeType: null,
   activeCategory: null,
-  selected: new Map()
+  selected: new Map(),
+  promptExpanded: true
 };
 
 const elements = {
@@ -22,6 +23,8 @@ const elements = {
   resetButton: document.querySelector("#resetButton"),
   headerReset: document.querySelector("#headerReset"),
   backButton: document.querySelector("#backButton"),
+  promptPanel: document.querySelector(".prompt-panel"),
+  promptToggle: document.querySelector("#promptToggle"),
   toast: document.querySelector("#toast"),
   stepPill: document.querySelector("#stepPill")
 };
@@ -53,6 +56,7 @@ function chooseType(typeId) {
   elements.builderSection.classList.remove("hidden");
   elements.activeTypeLabel.textContent = state.activeType.name.toUpperCase();
   elements.stepPill.textContent = "STEP 2 / 3";
+  setPromptExpanded(!window.matchMedia("(max-width: 760px)").matches);
   renderCategories();
   renderGallery();
   updatePrompt();
@@ -132,12 +136,36 @@ function countCategorySelections(categoryId) {
 
 function compilePrompt() {
   const subject = elements.subjectInput.value.trim();
-  const tags = [...new Set([...state.selected.values()].flatMap((item) => item.tags))];
-  if (!subject && tags.length === 0) return "";
+  const selections = [...state.selected.values()];
+  if (!subject && selections.length === 0) return "";
+
   const parts = [];
-  if (subject) parts.push(subject);
-  parts.push(...tags);
-  return `${parts.join("、")}。高品質で、細部まで丁寧に表現する。`;
+  if (subject) {
+    parts.push(`「${subject}」を主題とした${state.activeType.name}`);
+  } else {
+    parts.push(`${state.activeType.name}を制作する`);
+  }
+
+  state.activeType.categories.forEach((category) => {
+    const categoryTags = [...new Set(
+      selections
+        .filter((item) => item.categoryId === category.id)
+        .flatMap((item) => item.tags)
+    )];
+    if (categoryTags.length) parts.push(`${category.name}：${categoryTags.join("、")}`);
+  });
+
+  parts.push("全体に統一感を持たせる", "高品質", "細部まで丁寧に表現する");
+  return `${parts.join("。")}。`;
+}
+
+function setPromptExpanded(expanded) {
+  state.promptExpanded = expanded;
+  elements.promptPanel.classList.toggle("collapsed", !expanded);
+  document.body.classList.toggle("prompt-collapsed", !expanded);
+  elements.promptToggle.setAttribute("aria-expanded", String(expanded));
+  elements.promptToggle.querySelector(".toggle-label").textContent = expanded ? "収納" : "プロンプトを見る";
+  elements.promptToggle.querySelector(".toggle-icon").textContent = expanded ? "⌄" : "⌃";
 }
 
 function updatePrompt() {
@@ -209,6 +237,11 @@ elements.copyButton.addEventListener("click", copyPrompt);
 elements.resetButton.addEventListener("click", resetSelections);
 elements.headerReset.addEventListener("click", resetSelections);
 elements.backButton.addEventListener("click", returnToTypes);
+elements.promptToggle.addEventListener("click", () => setPromptExpanded(!state.promptExpanded));
+
+window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
+  if (state.activeType) setPromptExpanded(!event.matches);
+});
 
 renderTypes();
 updatePrompt();
