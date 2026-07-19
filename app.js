@@ -146,21 +146,38 @@ function renderGallery() {
     return;
   }
   const category = state.activeType.categories.find((item) => item.id === state.activeCategory);
+  const categoryIndex = state.activeType.categories.findIndex((item) => item.id === state.activeCategory);
+  const previousCategory = state.activeType.categories[categoryIndex - 1] || null;
+  const nextCategory = state.activeType.categories[categoryIndex + 1] || null;
   elements.gallery.innerHTML = `
     <div class="gallery-heading">
       <h2>${category.name}</h2>
-      <p>複数選択できます</p>
+      <p>${categoryIndex + 1} / ${state.activeType.categories.length} ・ 複数選択可</p>
     </div>
     <div class="image-grid">
       ${category.items.map((item) => renderItemCard(item)).join("")}
     </div>
+    <nav class="category-navigation" aria-label="カテゴリーを順番に移動">
+      <button type="button" class="category-move previous"
+        ${previousCategory ? `data-category-jump="${previousCategory.id}"` : "disabled"}>
+        <span aria-hidden="true">←</span>
+        <span><small>前のカテゴリー</small>${previousCategory?.name || "先頭です"}</span>
+      </button>
+      <span class="category-position">${categoryIndex + 1} / ${state.activeType.categories.length}</span>
+      <button type="button" class="category-move next"
+        ${nextCategory ? `data-category-jump="${nextCategory.id}"` : "disabled"}>
+        <span><small>次のカテゴリー</small>${nextCategory?.name || "最後です"}</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </nav>
   `;
 
-  elements.gallery.querySelectorAll("[data-item]").forEach((button) => {
-    button.addEventListener("click", () => toggleItem(button.dataset.item));
-  });
-  elements.gallery.querySelectorAll("img").forEach((image) => {
-    image.addEventListener("error", () => image.closest(".image-wrap").classList.add("image-error"));
+  bindGalleryInteractions();
+  elements.gallery.querySelectorAll("[data-category-jump]").forEach((button) => {
+    button.addEventListener("click", () => {
+      chooseCategory(button.dataset.categoryJump);
+      elements.gallery.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 }
 
@@ -184,6 +201,10 @@ function renderSearchResults() {
     ` : '<div class="search-empty">該当するアイテムがありません。別の言葉で検索してください。</div>'}
   `;
 
+  bindGalleryInteractions();
+}
+
+function bindGalleryInteractions() {
   elements.gallery.querySelectorAll("[data-item]").forEach((button) => {
     button.addEventListener("click", () => toggleItem(button.dataset.item));
   });
