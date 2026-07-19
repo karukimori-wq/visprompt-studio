@@ -42,6 +42,39 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function renderItemCard(item, categoryName = "") {
+  const selected = state.selected.has(item.id);
+  const categoryBadge = categoryName
+    ? `<span class="image-category">${categoryName}</span>`
+    : "";
+
+  if (!item.image) {
+    return `
+      <button class="image-card text-only ${selected ? "selected" : ""}"
+        type="button" data-item="${item.id}" aria-pressed="${selected}">
+        <span class="compact-choice">
+          ${categoryBadge}
+          <span class="compact-label">${item.label}</span>
+          <span class="compact-status">画像未設定</span>
+          <span class="checkmark">✓</span>
+        </span>
+      </button>
+    `;
+  }
+
+  return `
+    <button class="image-card ${selected ? "selected" : ""}"
+      type="button" data-item="${item.id}" aria-pressed="${selected}">
+      <span class="image-wrap">
+        <img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />
+        <span class="checkmark">✓</span>
+      </span>
+      ${categoryBadge}
+      <span class="image-label">${item.label}</span>
+    </button>
+  `;
+}
+
 function renderTypes() {
   elements.typeGrid.innerHTML = VIS_PROMPT_TYPES.map(
     (type, index) => `
@@ -119,18 +152,7 @@ function renderGallery() {
       <p>複数選択できます</p>
     </div>
     <div class="image-grid">
-      ${category.items.map((item) => `
-        <button class="image-card ${state.selected.has(item.id) ? "selected" : ""}"
-          type="button" data-item="${item.id}" aria-pressed="${state.selected.has(item.id)}">
-          <span class="image-wrap ${item.image ? "" : "no-image"}">
-            ${item.image
-              ? `<img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />`
-              : `<span class="no-image-label"><span aria-hidden="true">◇</span>画像未設定</span>`}
-            <span class="checkmark">✓</span>
-          </span>
-          <span class="image-label">${item.label}</span>
-        </button>
-      `).join("")}
+      ${category.items.map((item) => renderItemCard(item)).join("")}
     </div>
   `;
 
@@ -157,19 +179,7 @@ function renderSearchResults() {
     </div>
     ${results.length ? `
       <div class="image-grid">
-        ${results.map((item) => `
-          <button class="image-card ${state.selected.has(item.id) ? "selected" : ""}"
-            type="button" data-item="${item.id}" aria-pressed="${state.selected.has(item.id)}">
-            <span class="image-wrap ${item.image ? "" : "no-image"}">
-              ${item.image
-                ? `<img src="${item.image}" alt="${item.label}の参考イメージ" loading="lazy" />`
-                : `<span class="no-image-label"><span aria-hidden="true">◇</span>画像未設定</span>`}
-              <span class="checkmark">✓</span>
-            </span>
-            <span class="image-category">${item.categoryName}</span>
-            <span class="image-label">${item.label}</span>
-          </button>
-        `).join("")}
+        ${results.map((item) => renderItemCard(item, item.categoryName)).join("")}
       </div>
     ` : '<div class="search-empty">該当するアイテムがありません。別の言葉で検索してください。</div>'}
   `;
