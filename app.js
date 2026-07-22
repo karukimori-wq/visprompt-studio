@@ -22,6 +22,7 @@ const elements = {
   selectionCount: document.querySelector("#selectionCount"),
   mainSelectedChips: document.querySelector("#mainSelectedChips"),
   selectedOnlyToggle: document.querySelector("#selectedOnlyToggle"),
+  clearSelectedButton: document.querySelector("#clearSelectedButton"),
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
@@ -281,6 +282,14 @@ function toggleItem(itemId) {
   updatePrompt();
 }
 
+function clearSelectedItems() {
+  state.selected.clear();
+  state.showSelectedOnly = false;
+  renderCategories();
+  renderGallery();
+  updatePrompt();
+}
+
 function countCategorySelections(categoryId) {
   return [...state.selected.values()].filter((item) => item.categoryId === categoryId).length;
 }
@@ -442,6 +451,7 @@ function updatePrompt() {
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
   elements.selectedOnlyToggle.disabled = !count;
+  elements.clearSelectedButton.disabled = !count;
   elements.selectedOnlyToggle.classList.toggle("active", state.showSelectedOnly);
   elements.selectedOnlyToggle.textContent = state.showSelectedOnly ? "通常表示に戻る" : "選択済みだけ表示";
 
@@ -532,6 +542,10 @@ elements.selectedOnlyToggle.addEventListener("click", () => {
   state.showSelectedOnly = !state.showSelectedOnly;
   renderGallery();
   updatePrompt();
+});
+elements.clearSelectedButton.addEventListener("click", () => {
+  if (!state.selected.size) return;
+  clearSelectedItems();
 });
 elements.promptOutput.addEventListener("input", () => {
   elements.charCount.textContent = `${elements.promptOutput.value.length}文字`;
