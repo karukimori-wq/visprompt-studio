@@ -62,14 +62,25 @@
             <input id="subjectInput" type="text" placeholder="例：雨上がりの東京を歩く白い猫" maxlength="120" />
           </label>
 
-          <label class="prompt-mode-field">
-            <span>出力スタイル</span>
-            <select id="promptMode" aria-label="出力スタイルを選択">
-              <option value="standard">標準：そのまま使いやすい</option>
-              <option value="short">短め：要点だけ</option>
-              <option value="detailed">詳しめ：AIに細かく伝える</option>
-            </select>
-          </label>
+          <div class="prompt-options">
+            <label class="prompt-mode-field">
+              <span>出力スタイル</span>
+              <select id="promptMode" aria-label="出力スタイルを選択">
+                <option value="standard">標準：そのまま使いやすい</option>
+                <option value="short">短め：要点だけ</option>
+                <option value="detailed">詳しめ：AIに細かく伝える</option>
+              </select>
+            </label>
+
+            <label class="prompt-mode-field">
+              <span>出力形式</span>
+              <select id="promptFormat" aria-label="出力形式を選択">
+                <option value="text">文章</option>
+                <option value="yaml">YAML</option>
+                <option value="json">JSON</option>
+              </select>
+            </label>
+          </div>
 
           <label class="item-search-field">
             <span>アイテムを検索</span>
@@ -120,7 +131,7 @@
             </label>
             <div class="prompt-stats">
               <span id="charCount">0文字</span>
-              <span>日本語プロンプト</span>
+              <span id="promptFormatLabel">文章プロンプト</span>
             </div>
             <button class="copy-button" id="copyButton" type="button" disabled>
               <span aria-hidden="true">▣</span> プロンプトをコピー
