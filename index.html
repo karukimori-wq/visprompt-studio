@@ -69,8 +69,13 @@
 
           <section class="selected-summary" aria-label="選択中のアイテム">
             <div class="selected-summary-head">
-              <span>選択中</span>
-              <small>タップで解除</small>
+              <div>
+                <span>選択中</span>
+                <small>タップで解除</small>
+              </div>
+              <button class="selected-only-toggle" id="selectedOnlyToggle" type="button" disabled>
+                選択済みだけ表示
+              </button>
             </div>
             <div class="selected-chips inline" id="mainSelectedChips"></div>
           </section>
