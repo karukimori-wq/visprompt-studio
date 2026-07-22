@@ -275,6 +275,27 @@ button { color: inherit; }
   transition: border-color .2s, box-shadow .2s;
 }
 .item-search-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.selected-summary {
+  margin: -4px 0 18px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+}
+.selected-summary-head {
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.selected-summary-head span { font-size: 12px; font-weight: 700; }
+.selected-summary-head small { color: var(--muted); font-size: 10px; }
+.selected-chips.inline {
+  min-height: 34px;
+  margin: 0;
+  flex-wrap: wrap;
+  overflow: visible;
+}
 .mobile-category-field { display: none; }
 .category-tabs {
   display: flex;
