@@ -5,6 +5,7 @@ const state = {
   activeCategory: null,
   selected: new Map(),
   searchQuery: "",
+  showSelectedOnly: false,
   promptExpanded: true
 };
 
@@ -18,6 +19,7 @@ const elements = {
   activeTypeLabel: document.querySelector("#activeTypeLabel"),
   selectionCount: document.querySelector("#selectionCount"),
   mainSelectedChips: document.querySelector("#mainSelectedChips"),
+  selectedOnlyToggle: document.querySelector("#selectedOnlyToggle"),
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
@@ -100,6 +102,7 @@ function chooseType(typeId) {
   state.activeCategory = state.activeType.categories[0].id;
   state.selected.clear();
   state.searchQuery = "";
+  state.showSelectedOnly = false;
   elements.subjectInput.value = "";
   elements.itemSearch.value = "";
   elements.typeSection.classList.add("hidden");
@@ -136,12 +139,18 @@ function renderCategories() {
 function chooseCategory(categoryId) {
   state.activeCategory = categoryId;
   state.searchQuery = "";
+  state.showSelectedOnly = false;
   elements.itemSearch.value = "";
   renderCategories();
   renderGallery();
 }
 
 function renderGallery() {
+  if (state.showSelectedOnly) {
+    renderSelectedOnlyGallery();
+    return;
+  }
+
   if (state.searchQuery) {
     renderSearchResults();
     return;
@@ -205,6 +214,23 @@ function renderSearchResults() {
   bindGalleryInteractions();
 }
 
+function renderSelectedOnlyGallery() {
+  const selections = [...state.selected.values()];
+  elements.gallery.innerHTML = `
+    <div class="gallery-heading">
+      <h2>選択済みアイテム</h2>
+      <p>${selections.length}件 ・ タップで解除</p>
+    </div>
+    ${selections.length ? `
+      <div class="image-grid">
+        ${selections.map((item) => renderItemCard(item, item.categoryName)).join("")}
+      </div>
+    ` : '<div class="search-empty">まだアイテムが選択されていません。</div>'}
+  `;
+
+  bindGalleryInteractions();
+}
+
 function bindGalleryInteractions() {
   elements.gallery.querySelectorAll("[data-item]").forEach((button) => {
     button.addEventListener("click", () => toggleItem(button.dataset.item));
@@ -229,6 +255,7 @@ function toggleItem(itemId) {
     const item = findItem(itemId);
     if (item) state.selected.set(itemId, item);
   }
+  if (!state.selected.size) state.showSelectedOnly = false;
   renderCategories();
   renderGallery();
   updatePrompt();
@@ -280,6 +307,9 @@ function updatePrompt() {
   elements.charCount.textContent = `${prompt.length}文字`;
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
+  elements.selectedOnlyToggle.disabled = !count;
+  elements.selectedOnlyToggle.classList.toggle("active", state.showSelectedOnly);
+  elements.selectedOnlyToggle.textContent = state.showSelectedOnly ? "通常表示に戻る" : "選択済みだけ表示";
 
   renderSelectedChips(elements.mainSelectedChips, "まだ選択されていません");
   renderSelectedChips(elements.selectedChips, "選択したイメージがここに表示されます");
@@ -307,6 +337,7 @@ function resetSelections() {
   state.selected.clear();
   elements.subjectInput.value = "";
   state.searchQuery = "";
+  state.showSelectedOnly = false;
   elements.itemSearch.value = "";
   if (state.activeType) {
     renderCategories();
@@ -345,9 +376,19 @@ function returnToTypes() {
 elements.subjectInput.addEventListener("input", updatePrompt);
 elements.itemSearch.addEventListener("input", () => {
   state.searchQuery = elements.itemSearch.value.trim();
+  state.showSelectedOnly = false;
   renderGallery();
+  updatePrompt();
 });
 elements.categorySelect.addEventListener("change", () => chooseCategory(elements.categorySelect.value));
+elements.selectedOnlyToggle.addEventListener("click", () => {
+  if (!state.selected.size) return;
+  state.searchQuery = "";
+  elements.itemSearch.value = "";
+  state.showSelectedOnly = !state.showSelectedOnly;
+  renderGallery();
+  updatePrompt();
+});
 elements.promptOutput.addEventListener("input", () => {
   elements.charCount.textContent = `${elements.promptOutput.value.length}文字`;
   elements.copyButton.disabled = !elements.promptOutput.value.trim();
