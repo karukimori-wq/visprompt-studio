@@ -142,9 +142,6 @@
             <button class="copy-button" id="copyButton" type="button" disabled>
               <span aria-hidden="true">▣</span> プロンプトをコピー
             </button>
-            <button class="copy-button secondary-copy" id="copyImagePromptButton" type="button">
-              <span aria-hidden="true">▣</span> 画像生成文だけコピー
-            </button>
             <button class="text-button" id="resetButton" type="button">すべての選択をリセット</button>
           </div>
         </aside>
@@ -158,9 +155,10 @@
     <script>
       (() => {
         const output = document.querySelector("#promptOutput");
-        const button = document.querySelector("#copyImagePromptButton");
+        const format = document.querySelector("#promptFormat");
+        const button = document.querySelector("#copyButton");
         const toast = document.querySelector("#toast");
-        if (!output || !button) return;
+        if (!output || !format || !button) return;
 
         function extractImagePrompt(value) {
           const marker = "image_prompt: |";
@@ -174,6 +172,14 @@
             .trim();
         }
 
+        function copyLabel() {
+          return format.value === "yamlText" ? "画像生成文をコピー" : "プロンプトをコピー";
+        }
+
+        function updateCopyButtonLabel() {
+          button.innerHTML = `<span aria-hidden="true">▣</span> ${copyLabel()}`;
+        }
+
         async function copyText(value) {
           if (!value) return;
           try {
@@ -185,17 +191,26 @@
             document.execCommand("copy");
             output.value = previous;
           }
+          button.innerHTML = '<span aria-hidden="true">✓</span> コピーしました';
           if (toast) {
-            toast.textContent = "画像生成文をコピーしました";
+            toast.textContent = "コピーしました";
             toast.classList.add("show");
-            window.setTimeout(() => {
-              toast.classList.remove("show");
-              toast.textContent = "コピーしました";
-            }, 1800);
           }
+          window.setTimeout(() => {
+            if (toast) toast.classList.remove("show");
+            updateCopyButtonLabel();
+          }, 1800);
         }
 
-        button.addEventListener("click", () => copyText(extractImagePrompt(output.value)));
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const value = format.value === "yamlText" ? extractImagePrompt(output.value) : output.value.trim();
+          copyText(value);
+        }, true);
+
+        format.addEventListener("change", () => window.setTimeout(updateCopyButtonLabel, 0));
+        updateCopyButtonLabel();
       })();
     </script>
   </body>
