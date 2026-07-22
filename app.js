@@ -7,6 +7,7 @@ const state = {
   searchQuery: "",
   showSelectedOnly: false,
   promptMode: "standard",
+  promptFormat: "text",
   promptExpanded: true
 };
 
@@ -25,6 +26,8 @@ const elements = {
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
   promptMode: document.querySelector("#promptMode"),
+  promptFormat: document.querySelector("#promptFormat"),
+  promptFormatLabel: document.querySelector("#promptFormatLabel"),
   itemSearch: document.querySelector("#itemSearch"),
   charCount: document.querySelector("#charCount"),
   copyButton: document.querySelector("#copyButton"),
@@ -35,6 +38,12 @@ const elements = {
   promptToggle: document.querySelector("#promptToggle"),
   toast: document.querySelector("#toast"),
   stepPill: document.querySelector("#stepPill")
+};
+
+const promptFormatLabels = {
+  text: "文章プロンプト",
+  yaml: "YAMLプロンプト",
+  json: "JSONプロンプト"
 };
 
 function escapeHtml(value) {
@@ -106,8 +115,10 @@ function chooseType(typeId) {
   state.searchQuery = "";
   state.showSelectedOnly = false;
   state.promptMode = "standard";
+  state.promptFormat = "text";
   elements.subjectInput.value = "";
   elements.promptMode.value = state.promptMode;
+  elements.promptFormat.value = state.promptFormat;
   elements.itemSearch.value = "";
   elements.typeSection.classList.add("hidden");
   elements.builderSection.classList.remove("hidden");
@@ -269,52 +280,127 @@ function countCategorySelections(categoryId) {
   return [...state.selected.values()].filter((item) => item.categoryId === categoryId).length;
 }
 
-function compilePrompt() {
-  const subject = elements.subjectInput.value.trim();
-  const selections = [...state.selected.values()];
-  if (!subject && selections.length === 0) return "";
-
-  const groups = state.activeType.categories.map((category) => {
+function getPromptGroups(selections) {
+  return state.activeType.categories.map((category) => {
     const tags = [...new Set(
       selections
         .filter((item) => item.categoryId === category.id)
         .flatMap((item) => item.tags)
     )];
-    return { category, tags };
-  }).filter((group) => group.tags.length);
+    const items = selections
+      .filter((item) => item.categoryId === category.id)
+      .map((item) => item.label);
+    return { category, tags, items };
+  }).filter((group) => group.tags.length || group.items.length);
+}
 
+function getQualityDirectives() {
+  if (state.promptMode === "short") return ["高品質"];
+  if (state.promptMode === "detailed") {
+    return [
+      "選択した要素同士が自然につながるように構成する",
+      "主題が一目で伝わる構図にする",
+      "色・質感・余白・視線誘導まで丁寧に整える",
+      "完成度の高い商用品質に仕上げる"
+    ];
+  }
+  return ["全体に統一感を持たせる", "高品質", "細部まで丁寧に表現する"];
+}
+
+function getNegativeDirectives() {
+  return state.promptMode === "detailed"
+    ? ["低品質", "歪み", "不自然な文字", "過度な装飾"]
+    : [];
+}
+
+function buildPromptData(subject, groups) {
+  return {
+    type: state.activeType.name,
+    subject: subject || null,
+    style: state.promptMode,
+    categories: groups.map(({ category, tags, items }) => ({
+      name: category.name,
+      items,
+      tags
+    })),
+    quality: getQualityDirectives(),
+    negative: getNegativeDirectives()
+  };
+}
+
+function yamlScalar(value) {
+  if (value === null || value === undefined || value === "") return "null";
+  return JSON.stringify(value);
+}
+
+function yamlList(values, indent = "  ") {
+  if (!values.length) return `${indent}[]`;
+  return values.map((value) => `${indent}- ${yamlScalar(value)}`).join("\n");
+}
+
+function formatYaml(data) {
+  const lines = [
+    `type: ${yamlScalar(data.type)}`,
+    `subject: ${yamlScalar(data.subject)}`,
+    `style: ${yamlScalar(data.style)}`,
+    "categories:"
+  ];
+
+  if (!data.categories.length) {
+    lines.push("  []");
+  } else {
+    data.categories.forEach((category) => {
+      lines.push(`  - name: ${yamlScalar(category.name)}`);
+      lines.push("    items:");
+      lines.push(yamlList(category.items, "      "));
+      lines.push("    tags:");
+      lines.push(yamlList(category.tags, "      "));
+    });
+  }
+
+  lines.push("quality:");
+  lines.push(yamlList(data.quality, "  "));
+  lines.push("negative:");
+  lines.push(yamlList(data.negative, "  "));
+  return lines.join("\n");
+}
+
+function formatTextPrompt(data, groups) {
   if (state.promptMode === "short") {
-    const base = subject
-      ? `「${subject}」の${state.activeType.name}`
-      : `${state.activeType.name}`;
+    const base = data.subject
+      ? `「${data.subject}」の${data.type}`
+      : `${data.type}`;
     const tags = groups.flatMap((group) => group.tags);
-    return [base, ...tags, "高品質"].join("、");
+    return [base, ...tags, ...data.quality].join("、");
   }
 
   const parts = [];
-  if (subject) {
-    parts.push(`「${subject}」を主題とした${state.activeType.name}`);
+  if (data.subject) {
+    parts.push(`「${data.subject}」を主題とした${data.type}`);
   } else {
-    parts.push(`${state.activeType.name}を制作する`);
+    parts.push(`${data.type}を制作する`);
   }
 
   groups.forEach(({ category, tags }) => {
     parts.push(`${category.name}：${tags.join("、")}`);
   });
 
-  if (state.promptMode === "detailed") {
-    parts.push(
-      "選択した要素同士が自然につながるように構成する",
-      "主題が一目で伝わる構図にする",
-      "色・質感・余白・視線誘導まで丁寧に整える",
-      "完成度の高い商用品質に仕上げる",
-      "低品質、歪み、不自然な文字、過度な装飾は避ける"
-    );
-  } else {
-    parts.push("全体に統一感を持たせる", "高品質", "細部まで丁寧に表現する");
-  }
+  parts.push(...data.quality);
+  if (data.negative.length) parts.push(`避ける要素：${data.negative.join("、")}`);
+  return `${parts.join("。")}${state.promptMode === "short" ? "" : "。"}`;
+}
 
-  return `${parts.join("。")}。`;
+function compilePrompt() {
+  const subject = elements.subjectInput.value.trim();
+  const selections = [...state.selected.values()];
+  if (!subject && selections.length === 0) return "";
+
+  const groups = getPromptGroups(selections);
+  const data = buildPromptData(subject, groups);
+
+  if (state.promptFormat === "yaml") return formatYaml(data);
+  if (state.promptFormat === "json") return JSON.stringify(data, null, 2);
+  return formatTextPrompt(data, groups);
 }
 
 function setPromptExpanded(expanded) {
@@ -332,6 +418,7 @@ function updatePrompt() {
   elements.selectionCount.textContent = count;
   elements.promptOutput.value = prompt;
   elements.charCount.textContent = `${prompt.length}文字`;
+  elements.promptFormatLabel.textContent = promptFormatLabels[state.promptFormat];
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
   elements.selectedOnlyToggle.disabled = !count;
@@ -403,6 +490,10 @@ function returnToTypes() {
 elements.subjectInput.addEventListener("input", updatePrompt);
 elements.promptMode.addEventListener("change", () => {
   state.promptMode = elements.promptMode.value;
+  updatePrompt();
+});
+elements.promptFormat.addEventListener("change", () => {
+  state.promptFormat = elements.promptFormat.value;
   updatePrompt();
 });
 elements.itemSearch.addEventListener("input", () => {
