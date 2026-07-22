@@ -67,6 +67,14 @@
             <input id="itemSearch" type="search" placeholder="例：パステル、ミニマル、夕暮れ" autocomplete="off" />
           </label>
 
+          <section class="selected-summary" aria-label="選択中のアイテム">
+            <div class="selected-summary-head">
+              <span>選択中</span>
+              <small>タップで解除</small>
+            </div>
+            <div class="selected-chips inline" id="mainSelectedChips"></div>
+          </section>
+
           <label class="mobile-category-field">
             <span>カテゴリーを選択</span>
             <select id="categorySelect" aria-label="カテゴリーを選択"></select>
