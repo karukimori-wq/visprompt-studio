@@ -142,6 +142,9 @@
             <button class="copy-button" id="copyButton" type="button" disabled>
               <span aria-hidden="true">▣</span> プロンプトをコピー
             </button>
+            <button class="copy-button secondary-copy" id="copyImagePromptButton" type="button">
+              <span aria-hidden="true">▣</span> 画像生成文だけコピー
+            </button>
             <button class="text-button" id="resetButton" type="button">すべての選択をリセット</button>
           </div>
         </aside>
@@ -152,5 +155,48 @@
 
     <script src="./data.js"></script>
     <script src="./app.js"></script>
+    <script>
+      (() => {
+        const output = document.querySelector("#promptOutput");
+        const button = document.querySelector("#copyImagePromptButton");
+        const toast = document.querySelector("#toast");
+        if (!output || !button) return;
+
+        function extractImagePrompt(value) {
+          const marker = "image_prompt: |";
+          const index = value.indexOf(marker);
+          if (index === -1) return value.trim();
+          return value
+            .slice(index + marker.length)
+            .split("\n")
+            .map((line) => line.replace(/^  /, ""))
+            .join("\n")
+            .trim();
+        }
+
+        async function copyText(value) {
+          if (!value) return;
+          try {
+            await navigator.clipboard.writeText(value);
+          } catch {
+            const previous = output.value;
+            output.value = value;
+            output.select();
+            document.execCommand("copy");
+            output.value = previous;
+          }
+          if (toast) {
+            toast.textContent = "画像生成文をコピーしました";
+            toast.classList.add("show");
+            window.setTimeout(() => {
+              toast.classList.remove("show");
+              toast.textContent = "コピーしました";
+            }, 1800);
+          }
+        }
+
+        button.addEventListener("click", () => copyText(extractImagePrompt(output.value)));
+      })();
+    </script>
   </body>
 </html>
