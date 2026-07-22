@@ -316,15 +316,16 @@ function getNegativeDirectives() {
 }
 
 function buildPromptData(subject, groups) {
+  const prompt = {};
+  groups.forEach(({ category, tags }) => {
+    prompt[category.name] = tags;
+  });
+
   return {
     type: state.activeType.name,
     subject: subject || null,
     style: state.promptMode,
-    categories: groups.map(({ category, tags, items }) => ({
-      name: category.name,
-      items,
-      tags
-    })),
+    prompt,
     quality: getQualityDirectives(),
     negative: getNegativeDirectives()
   };
@@ -345,18 +346,16 @@ function formatYaml(data) {
     `type: ${yamlScalar(data.type)}`,
     `subject: ${yamlScalar(data.subject)}`,
     `style: ${yamlScalar(data.style)}`,
-    "categories:"
+    "prompt:"
   ];
 
-  if (!data.categories.length) {
+  const promptEntries = Object.entries(data.prompt);
+  if (!promptEntries.length) {
     lines.push("  []");
   } else {
-    data.categories.forEach((category) => {
-      lines.push(`  - name: ${yamlScalar(category.name)}`);
-      lines.push("    items:");
-      lines.push(yamlList(category.items, "      "));
-      lines.push("    tags:");
-      lines.push(yamlList(category.tags, "      "));
+    promptEntries.forEach(([categoryName, tags]) => {
+      lines.push(`  ${categoryName}:`);
+      lines.push(yamlList(tags, "    "));
     });
   }
 
