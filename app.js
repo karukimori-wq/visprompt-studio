@@ -17,6 +17,7 @@ const elements = {
   gallery: document.querySelector("#gallery"),
   activeTypeLabel: document.querySelector("#activeTypeLabel"),
   selectionCount: document.querySelector("#selectionCount"),
+  mainSelectedChips: document.querySelector("#mainSelectedChips"),
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
@@ -280,16 +281,24 @@ function updatePrompt() {
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
 
+  renderSelectedChips(elements.mainSelectedChips, "まだ選択されていません");
+  renderSelectedChips(elements.selectedChips, "選択したイメージがここに表示されます");
+}
+
+function renderSelectedChips(container, emptyMessage) {
+  const count = state.selected.size;
   if (!count) {
-    elements.selectedChips.innerHTML = '<span class="empty-selection">選択したイメージがここに表示されます</span>';
+    container.innerHTML = `<span class="empty-selection">${emptyMessage}</span>`;
     return;
   }
-  elements.selectedChips.innerHTML = [...state.selected.values()].map((item) => `
+
+  container.innerHTML = [...state.selected.values()].map((item) => `
     <button type="button" class="selected-chip" data-remove="${item.id}" title="選択解除">
       ${item.label}<span>×</span>
     </button>
   `).join("");
-  elements.selectedChips.querySelectorAll("[data-remove]").forEach((button) => {
+
+  container.querySelectorAll("[data-remove]").forEach((button) => {
     button.addEventListener("click", () => toggleItem(button.dataset.remove));
   });
 }
