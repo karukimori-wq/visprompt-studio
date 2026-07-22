@@ -287,9 +287,34 @@ button { color: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
+.selected-summary-head span,
+.selected-summary-head small { display: block; }
 .selected-summary-head span { font-size: 12px; font-weight: 700; }
-.selected-summary-head small { color: var(--muted); font-size: 10px; }
+.selected-summary-head small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.selected-only-toggle {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  color: var(--accent-dark);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+.selected-only-toggle.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+.selected-only-toggle:disabled {
+  color: #aaa7b3;
+  background: #efedf4;
+  cursor: not-allowed;
+}
 .selected-chips.inline {
   min-height: 34px;
   margin: 0;
