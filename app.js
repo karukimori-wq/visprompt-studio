@@ -44,6 +44,7 @@ const elements = {
 const promptFormatLabels = {
   text: "文章プロンプト",
   yaml: "YAMLプロンプト",
+  yamlText: "YAML + 文章",
   json: "JSONプロンプト"
 };
 
@@ -374,6 +375,15 @@ function formatYaml(data) {
   return lines.join("\n");
 }
 
+function indentBlock(value, indent = "  ") {
+  return value.split("\n").map((line) => `${indent}${line}`).join("\n");
+}
+
+function formatYamlWithText(data, groups) {
+  const textPrompt = formatTextPrompt(data, groups);
+  return `${formatYaml(data)}\nimage_prompt: |\n${indentBlock(textPrompt)}`;
+}
+
 function formatTextPrompt(data, groups) {
   if (state.promptMode === "short") {
     const base = data.subject
@@ -408,6 +418,7 @@ function compilePrompt() {
   const data = buildPromptData(subject, groups);
 
   if (state.promptFormat === "yaml") return formatYaml(data);
+  if (state.promptFormat === "yamlText") return formatYamlWithText(data, groups);
   if (state.promptFormat === "json") return JSON.stringify(data, null, 2);
   return formatTextPrompt(data, groups);
 }
