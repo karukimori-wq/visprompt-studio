@@ -66,6 +66,92 @@
         gap: 8px;
       }
 
+      .prompt-options.enhanced {
+        display: grid;
+        gap: 18px;
+        margin: 24px 0 22px;
+      }
+
+      .native-select-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      .choice-field {
+        display: grid;
+        gap: 10px;
+        border: 0;
+        margin: 0;
+        padding: 0;
+      }
+
+      .choice-title {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+
+      .choice-title small {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .choice-grid.format-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .choice-button {
+        display: grid;
+        gap: 3px;
+        min-height: 60px;
+        padding: 10px 8px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, color .18s ease;
+      }
+
+      .choice-button strong {
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .choice-button span {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+
+      .choice-button.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        box-shadow: inset 0 0 0 1px var(--accent), 0 10px 24px rgba(101, 88, 245, 0.12);
+        color: var(--accent-dark);
+      }
+
+      .choice-button.active span {
+        color: var(--accent-dark);
+      }
+
       @media (max-width: 760px) {
         .site-header {
           height: 64px;
@@ -114,6 +200,17 @@
         .type-icon svg {
           width: 27px;
           height: 27px;
+        }
+
+        .choice-grid,
+        .choice-grid.format-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .choice-button {
+          min-height: 58px;
+          padding: 10px 12px;
+          border-radius: 15px;
         }
 
         .mobile-category-field {
@@ -197,8 +294,8 @@
             <input id="negativeInput" type="text" placeholder="例：低品質、歪み、不自然な文字" maxlength="160" />
           </label>
 
-          <div class="prompt-options">
-            <label class="prompt-mode-field">
+          <div class="prompt-options enhanced">
+            <label class="prompt-mode-field native-select-only">
               <span>出力スタイル</span>
               <select id="promptMode" aria-label="出力スタイルを選択">
                 <option value="standard">標準：そのまま使いやすい</option>
@@ -207,7 +304,22 @@
               </select>
             </label>
 
-            <label class="prompt-mode-field">
+            <fieldset class="choice-field" aria-labelledby="styleChoiceLabel">
+              <legend class="choice-title" id="styleChoiceLabel">出力スタイル <small>文章量</small></legend>
+              <div class="choice-grid" data-choice-group="promptMode">
+                <button class="choice-button" type="button" data-select-target="promptMode" data-select-value="standard">
+                  <strong>標準</strong><span>そのまま使いやすい</span>
+                </button>
+                <button class="choice-button" type="button" data-select-target="promptMode" data-select-value="short">
+                  <strong>短め</strong><span>要点だけ</span>
+                </button>
+                <button class="choice-button" type="button" data-select-target="promptMode" data-select-value="detailed">
+                  <strong>詳しめ</strong><span>細かく指示</span>
+                </button>
+              </div>
+            </fieldset>
+
+            <label class="prompt-mode-field native-select-only">
               <span>出力形式</span>
               <select id="promptFormat" aria-label="出力形式を選択">
                 <option value="text">文章</option>
@@ -216,6 +328,24 @@
                 <option value="json">JSON</option>
               </select>
             </label>
+
+            <fieldset class="choice-field" aria-labelledby="formatChoiceLabel">
+              <legend class="choice-title" id="formatChoiceLabel">出力形式 <small>コピー形式</small></legend>
+              <div class="choice-grid format-grid" data-choice-group="promptFormat">
+                <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="yaml">
+                  <strong>YAML</strong><span>構造化</span>
+                </button>
+                <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="text">
+                  <strong>文章</strong><span>貼り付け用</span>
+                </button>
+                <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="yamlText">
+                  <strong>YAML＋文章</strong><span>管理と生成</span>
+                </button>
+                <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="json">
+                  <strong>JSON</strong><span>データ用</span>
+                </button>
+              </div>
+            </fieldset>
           </div>
 
           <label class="item-search-field">
@@ -313,6 +443,40 @@
       })();
     </script>
     <script src="./app.js"></script>
+    <script>
+      (() => {
+        function syncChoiceGroup(selectId) {
+          const select = document.querySelector(`#${selectId}`);
+          if (!select) return;
+          document.querySelectorAll(`[data-select-target="${selectId}"]`).forEach((button) => {
+            const active = button.dataset.selectValue === select.value;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-pressed", String(active));
+          });
+        }
+
+        function setSelectValue(selectId, value) {
+          const select = document.querySelector(`#${selectId}`);
+          if (!select || select.value === value) return;
+          select.value = value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          syncChoiceGroup(selectId);
+        }
+
+        document.querySelectorAll("[data-select-target]").forEach((button) => {
+          button.addEventListener("click", () => {
+            setSelectValue(button.dataset.selectTarget, button.dataset.selectValue);
+          });
+        });
+
+        ["promptMode", "promptFormat"].forEach((selectId) => {
+          const select = document.querySelector(`#${selectId}`);
+          if (!select) return;
+          select.addEventListener("change", () => syncChoiceGroup(selectId));
+          syncChoiceGroup(selectId);
+        });
+      })();
+    </script>
     <script>
       (() => {
         const output = document.querySelector("#promptOutput");
