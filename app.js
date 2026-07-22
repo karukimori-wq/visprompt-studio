@@ -6,6 +6,7 @@ const state = {
   selected: new Map(),
   searchQuery: "",
   showSelectedOnly: false,
+  promptMode: "standard",
   promptExpanded: true
 };
 
@@ -23,6 +24,7 @@ const elements = {
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
+  promptMode: document.querySelector("#promptMode"),
   itemSearch: document.querySelector("#itemSearch"),
   charCount: document.querySelector("#charCount"),
   copyButton: document.querySelector("#copyButton"),
@@ -103,7 +105,9 @@ function chooseType(typeId) {
   state.selected.clear();
   state.searchQuery = "";
   state.showSelectedOnly = false;
+  state.promptMode = "standard";
   elements.subjectInput.value = "";
+  elements.promptMode.value = state.promptMode;
   elements.itemSearch.value = "";
   elements.typeSection.classList.add("hidden");
   elements.builderSection.classList.remove("hidden");
@@ -270,6 +274,23 @@ function compilePrompt() {
   const selections = [...state.selected.values()];
   if (!subject && selections.length === 0) return "";
 
+  const groups = state.activeType.categories.map((category) => {
+    const tags = [...new Set(
+      selections
+        .filter((item) => item.categoryId === category.id)
+        .flatMap((item) => item.tags)
+    )];
+    return { category, tags };
+  }).filter((group) => group.tags.length);
+
+  if (state.promptMode === "short") {
+    const base = subject
+      ? `「${subject}」の${state.activeType.name}`
+      : `${state.activeType.name}`;
+    const tags = groups.flatMap((group) => group.tags);
+    return [base, ...tags, "高品質"].join("、");
+  }
+
   const parts = [];
   if (subject) {
     parts.push(`「${subject}」を主題とした${state.activeType.name}`);
@@ -277,16 +298,22 @@ function compilePrompt() {
     parts.push(`${state.activeType.name}を制作する`);
   }
 
-  state.activeType.categories.forEach((category) => {
-    const categoryTags = [...new Set(
-      selections
-        .filter((item) => item.categoryId === category.id)
-        .flatMap((item) => item.tags)
-    )];
-    if (categoryTags.length) parts.push(`${category.name}：${categoryTags.join("、")}`);
+  groups.forEach(({ category, tags }) => {
+    parts.push(`${category.name}：${tags.join("、")}`);
   });
 
-  parts.push("全体に統一感を持たせる", "高品質", "細部まで丁寧に表現する");
+  if (state.promptMode === "detailed") {
+    parts.push(
+      "選択した要素同士が自然につながるように構成する",
+      "主題が一目で伝わる構図にする",
+      "色・質感・余白・視線誘導まで丁寧に整える",
+      "完成度の高い商用品質に仕上げる",
+      "低品質、歪み、不自然な文字、過度な装飾は避ける"
+    );
+  } else {
+    parts.push("全体に統一感を持たせる", "高品質", "細部まで丁寧に表現する");
+  }
+
   return `${parts.join("。")}。`;
 }
 
@@ -374,6 +401,10 @@ function returnToTypes() {
 }
 
 elements.subjectInput.addEventListener("input", updatePrompt);
+elements.promptMode.addEventListener("change", () => {
+  state.promptMode = elements.promptMode.value;
+  updatePrompt();
+});
 elements.itemSearch.addEventListener("input", () => {
   state.searchQuery = elements.itemSearch.value.trim();
   state.showSelectedOnly = false;
