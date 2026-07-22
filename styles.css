@@ -262,6 +262,21 @@ button { color: inherit; }
   transition: border-color .2s, box-shadow .2s;
 }
 .subject-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); background: white; }
+.prompt-mode-field { display: block; margin: -8px 0 18px; }
+.prompt-mode-field > span { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
+.prompt-mode-field select {
+  width: 100%;
+  min-height: 45px;
+  padding: 0 38px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+.prompt-mode-field select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .item-search-field { display: block; margin: -8px 0 18px; }
 .item-search-field > span { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
 .item-search-field input {
