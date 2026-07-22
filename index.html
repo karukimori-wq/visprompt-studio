@@ -62,6 +62,15 @@
             <input id="subjectInput" type="text" placeholder="例：雨上がりの東京を歩く白い猫" maxlength="120" />
           </label>
 
+          <label class="prompt-mode-field">
+            <span>出力スタイル</span>
+            <select id="promptMode" aria-label="出力スタイルを選択">
+              <option value="standard">標準：そのまま使いやすい</option>
+              <option value="short">短め：要点だけ</option>
+              <option value="detailed">詳しめ：AIに細かく伝える</option>
+            </select>
+          </label>
+
           <label class="item-search-field">
             <span>アイテムを検索</span>
             <input id="itemSearch" type="search" placeholder="例：パステル、ミニマル、夕暮れ" autocomplete="off" />
