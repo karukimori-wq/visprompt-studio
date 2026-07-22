@@ -7,7 +7,7 @@ const state = {
   searchQuery: "",
   showSelectedOnly: false,
   promptMode: "standard",
-  promptFormat: "text",
+  promptFormat: "yaml",
   promptExpanded: true
 };
 
@@ -46,6 +46,8 @@ const promptFormatLabels = {
   json: "JSONプロンプト"
 };
 
+const showMappedImages = false;
+
 function escapeHtml(value) {
   return value.replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -62,7 +64,7 @@ function renderItemCard(item, categoryName = "") {
     ? `<span class="image-category">${categoryName}</span>`
     : "";
 
-  if (!item.image) {
+  if (!showMappedImages || !item.image) {
     return `
       <button class="image-card text-only ${selected ? "selected" : ""}"
         type="button" data-item="${item.id}" aria-pressed="${selected}">
@@ -115,7 +117,7 @@ function chooseType(typeId) {
   state.searchQuery = "";
   state.showSelectedOnly = false;
   state.promptMode = "standard";
-  state.promptFormat = "text";
+  state.promptFormat = "yaml";
   elements.subjectInput.value = "";
   elements.promptMode.value = state.promptMode;
   elements.promptFormat.value = state.promptFormat;
