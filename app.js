@@ -25,6 +25,7 @@ const elements = {
   selectedChips: document.querySelector("#selectedChips"),
   promptOutput: document.querySelector("#promptOutput"),
   subjectInput: document.querySelector("#subjectInput"),
+  negativeInput: document.querySelector("#negativeInput"),
   promptMode: document.querySelector("#promptMode"),
   promptFormat: document.querySelector("#promptFormat"),
   promptFormatLabel: document.querySelector("#promptFormatLabel"),
@@ -119,6 +120,7 @@ function chooseType(typeId) {
   state.promptMode = "standard";
   state.promptFormat = "yaml";
   elements.subjectInput.value = "";
+  elements.negativeInput.value = "";
   elements.promptMode.value = state.promptMode;
   elements.promptFormat.value = state.promptFormat;
   elements.itemSearch.value = "";
@@ -310,9 +312,15 @@ function getQualityDirectives() {
 }
 
 function getNegativeDirectives() {
-  return state.promptMode === "detailed"
+  const defaults = state.promptMode === "detailed"
     ? ["低品質", "歪み", "不自然な文字", "過度な装飾"]
     : [];
+  const customDirectives = elements.negativeInput.value
+    .split(/[、,\n]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return [...new Set([...defaults, ...customDirectives])];
 }
 
 function buildPromptData(subject, groups) {
@@ -454,6 +462,7 @@ function resetSelections() {
   state.searchQuery = "";
   state.showSelectedOnly = false;
   elements.itemSearch.value = "";
+  elements.negativeInput.value = "";
   if (state.activeType) {
     renderCategories();
     renderGallery();
@@ -489,6 +498,7 @@ function returnToTypes() {
 }
 
 elements.subjectInput.addEventListener("input", updatePrompt);
+elements.negativeInput.addEventListener("input", updatePrompt);
 elements.promptMode.addEventListener("change", () => {
   state.promptMode = elements.promptMode.value;
   updatePrompt();
