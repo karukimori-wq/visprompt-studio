@@ -561,5 +561,22 @@
         updateCopyButtonLabel();
       })();
     </script>
+    <script>
+      (() => {
+        const summary = document.querySelector(".selected-summary");
+        const chips = document.querySelector("#mainSelectedChips");
+        if (!summary || !chips) return;
+
+        function syncSelectedSummary() {
+          summary.classList.toggle("hidden", !chips.querySelector(".selected-chip"));
+        }
+
+        new MutationObserver(syncSelectedSummary).observe(chips, {
+          childList: true,
+          subtree: true
+        });
+        syncSelectedSummary();
+      })();
+    </script>
   </body>
 </html>
