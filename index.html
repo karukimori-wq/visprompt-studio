@@ -578,5 +578,23 @@
         syncSelectedSummary();
       })();
     </script>
+    <script>
+      (() => {
+        const tabs = document.querySelector("#categoryTabs");
+        if (!tabs) return;
+
+        function syncCategoryCounts() {
+          tabs.querySelectorAll(".category-tab span").forEach((count) => {
+            count.hidden = count.textContent.trim() === "0";
+          });
+        }
+
+        new MutationObserver(syncCategoryCounts).observe(tabs, {
+          childList: true,
+          subtree: true
+        });
+        syncCategoryCounts();
+      })();
+    </script>
   </body>
 </html>
