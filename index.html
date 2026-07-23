@@ -68,8 +68,12 @@
 
       .prompt-options.enhanced {
         display: grid;
-        gap: 18px;
-        margin: 24px 0 22px;
+        gap: 8px;
+        margin: 16px 0 14px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(250, 249, 255, 0.78);
       }
 
       .native-select-only {
@@ -83,73 +87,72 @@
 
       .choice-field {
         display: grid;
-        gap: 10px;
+        grid-template-columns: 72px minmax(0, 1fr);
+        align-items: center;
+        gap: 9px;
         border: 0;
         margin: 0;
         padding: 0;
       }
 
       .choice-title {
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--ink);
+        display: block;
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--muted);
+        white-space: nowrap;
       }
 
       .choice-title small {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--muted);
+        display: none;
       }
 
-      .choice-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-      }
-
+      .choice-grid,
       .choice-grid.format-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 2px;
+        scroll-padding-left: 2px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .choice-grid::-webkit-scrollbar {
+        display: none;
       }
 
       .choice-button {
-        display: grid;
-        gap: 3px;
-        min-height: 60px;
-        padding: 10px 8px;
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0 13px;
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-radius: 999px;
         background: #fff;
         color: var(--ink);
         font: inherit;
-        text-align: left;
+        text-align: center;
         cursor: pointer;
         transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, color .18s ease;
       }
 
       .choice-button strong {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 900;
+        line-height: 1;
       }
 
       .choice-button span {
-        font-size: 11px;
-        font-weight: 700;
-        color: var(--muted);
-        line-height: 1.35;
+        display: none;
       }
 
       .choice-button.active {
         border-color: var(--accent);
-        background: var(--accent-soft);
-        box-shadow: inset 0 0 0 1px var(--accent), 0 10px 24px rgba(101, 88, 245, 0.12);
-        color: var(--accent-dark);
-      }
-
-      .choice-button.active span {
-        color: var(--accent-dark);
+        background: var(--accent);
+        box-shadow: 0 8px 18px rgba(101, 88, 245, 0.18);
+        color: #fff;
       }
 
       @media (max-width: 760px) {
@@ -202,15 +205,35 @@
           height: 27px;
         }
 
+        .prompt-options.enhanced {
+          margin: 14px 0 12px;
+          padding: 9px 10px;
+          border-radius: 16px;
+        }
+
+        .choice-field {
+          grid-template-columns: 60px minmax(0, 1fr);
+          gap: 8px;
+        }
+
+        .choice-title {
+          font-size: 12px;
+        }
+
         .choice-grid,
         .choice-grid.format-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          display: flex;
+          grid-template-columns: none;
         }
 
         .choice-button {
-          min-height: 58px;
-          padding: 10px 12px;
-          border-radius: 15px;
+          min-height: 32px;
+          padding: 0 11px;
+          border-radius: 999px;
+        }
+
+        .choice-button strong {
+          font-size: 12px;
         }
 
         .mobile-category-field {
@@ -305,7 +328,7 @@
             </label>
 
             <fieldset class="choice-field" aria-labelledby="styleChoiceLabel">
-              <legend class="choice-title" id="styleChoiceLabel">出力スタイル <small>文章量</small></legend>
+              <legend class="choice-title" id="styleChoiceLabel">文量 <small>出力スタイル</small></legend>
               <div class="choice-grid" data-choice-group="promptMode">
                 <button class="choice-button" type="button" data-select-target="promptMode" data-select-value="standard">
                   <strong>標準</strong><span>そのまま使いやすい</span>
@@ -330,7 +353,7 @@
             </label>
 
             <fieldset class="choice-field" aria-labelledby="formatChoiceLabel">
-              <legend class="choice-title" id="formatChoiceLabel">出力形式 <small>コピー形式</small></legend>
+              <legend class="choice-title" id="formatChoiceLabel">形式 <small>出力形式</small></legend>
               <div class="choice-grid format-grid" data-choice-group="promptFormat">
                 <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="yaml">
                   <strong>YAML</strong><span>構造化</span>
@@ -339,7 +362,7 @@
                   <strong>文章</strong><span>貼り付け用</span>
                 </button>
                 <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="yamlText">
-                  <strong>YAML＋文章</strong><span>管理と生成</span>
+                  <strong>YAML+文</strong><span>管理と生成</span>
                 </button>
                 <button class="choice-button" type="button" data-select-target="promptFormat" data-select-value="json">
                   <strong>JSON</strong><span>データ用</span>
