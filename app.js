@@ -8,7 +8,8 @@ const state = {
   showSelectedOnly: false,
   promptMode: "standard",
   promptFormat: "yaml",
-  promptExpanded: true
+  promptExpanded: true,
+  advancedOpen: false
 };
 
 const elements = {
@@ -30,6 +31,8 @@ const elements = {
   promptMode: document.querySelector("#promptMode"),
   promptFormat: document.querySelector("#promptFormat"),
   promptFormatLabel: document.querySelector("#promptFormatLabel"),
+  advancedToggle: document.querySelector("#advancedToggle"),
+  advancedSummary: document.querySelector("#advancedSummary"),
   itemSearch: document.querySelector("#itemSearch"),
   charCount: document.querySelector("#charCount"),
   copyButton: document.querySelector("#copyButton"),
@@ -121,6 +124,7 @@ function chooseType(typeId) {
   state.showSelectedOnly = false;
   state.promptMode = "standard";
   state.promptFormat = "yaml";
+  state.advancedOpen = false;
   elements.subjectInput.value = "";
   elements.negativeInput.value = "";
   elements.promptMode.value = state.promptMode;
@@ -130,6 +134,7 @@ function chooseType(typeId) {
   elements.builderSection.classList.remove("hidden");
   elements.activeTypeLabel.textContent = state.activeType.name.toUpperCase();
   elements.stepPill.textContent = "STEP 2 / 3";
+  syncAdvancedSettings();
   setPromptExpanded(!window.matchMedia("(max-width: 760px)").matches);
   renderCategories();
   renderGallery();
@@ -454,6 +459,7 @@ function updatePrompt() {
   elements.promptOutput.value = prompt;
   elements.charCount.textContent = `${prompt.length}文字`;
   elements.promptFormatLabel.textContent = promptFormatLabels[state.promptFormat];
+  syncAdvancedSettings();
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
   elements.selectedOnlyToggle.disabled = !count;
@@ -463,6 +469,16 @@ function updatePrompt() {
 
   renderSelectedChips(elements.mainSelectedChips, "まだ選択されていません");
   renderSelectedChips(elements.selectedChips, "選択したイメージがここに表示されます");
+}
+
+function syncAdvancedSettings() {
+  if (!elements.advancedToggle) return;
+  const modeLabel = elements.promptMode.selectedOptions[0]?.textContent.split("：")[0] || "標準";
+  const formatLabel = elements.promptFormat.selectedOptions[0]?.textContent || "YAML";
+  elements.advancedSummary.textContent = `${modeLabel} / ${formatLabel}`;
+  elements.advancedToggle.setAttribute("aria-expanded", String(state.advancedOpen));
+  elements.advancedToggle.querySelector(".toggle-icon").textContent = state.advancedOpen ? "⌄" : "⌃";
+  document.body.classList.toggle("advanced-open", state.advancedOpen);
 }
 
 function renderSelectedChips(container, emptyMessage) {
@@ -533,6 +549,10 @@ elements.promptMode.addEventListener("change", () => {
 elements.promptFormat.addEventListener("change", () => {
   state.promptFormat = elements.promptFormat.value;
   updatePrompt();
+});
+elements.advancedToggle?.addEventListener("click", () => {
+  state.advancedOpen = !state.advancedOpen;
+  syncAdvancedSettings();
 });
 elements.itemSearch.addEventListener("input", () => {
   state.searchQuery = elements.itemSearch.value.trim();
