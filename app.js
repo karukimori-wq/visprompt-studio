@@ -155,6 +155,12 @@ function renderCategories() {
   elements.categoryTabs.querySelectorAll("[data-category]").forEach((button) => {
     button.addEventListener("click", () => chooseCategory(button.dataset.category));
   });
+
+  elements.categoryTabs.querySelector(".category-tab.active")?.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+    inline: "nearest"
+  });
 }
 
 function chooseCategory(categoryId) {
