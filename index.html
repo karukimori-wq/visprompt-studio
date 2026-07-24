@@ -295,12 +295,18 @@
 
         .category-tabs {
           display: flex;
+          position: sticky;
+          top: 64px;
+          z-index: 18;
           margin: 0 -15px 14px;
-          padding: 0 15px 12px;
+          padding: 8px 15px 10px;
           overflow-x: auto;
           scroll-padding-left: 15px;
           scroll-snap-type: x proximity;
           -webkit-overflow-scrolling: touch;
+          background: rgba(255, 255, 255, 0.94);
+          border-bottom: 1px solid rgba(232, 230, 238, 0.85);
+          backdrop-filter: blur(14px);
         }
 
         .category-tabs::-webkit-scrollbar {
