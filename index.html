@@ -244,6 +244,19 @@
         color: var(--accent);
       }
 
+      .prompt-mini-meta {
+        display: none;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .prompt-panel.collapsed .prompt-mini-meta {
+        display: block;
+      }
+
       @media (max-width: 760px) {
         .site-header {
           height: 64px;
@@ -582,6 +595,7 @@
             <div>
               <span class="panel-kicker">LIVE PROMPT</span>
               <h2>生成プロンプト</h2>
+              <span class="prompt-mini-meta" id="promptMiniMeta">0件 / YAML</span>
             </div>
             <div class="prompt-panel-actions">
               <span class="live-dot">自動更新</span>
