@@ -58,7 +58,9 @@ const promptFormatLabels = {
 
 const showMappedImages = false;
 const storageKeys = {
-  advancedOpen: "visprompt.advancedOpen"
+  advancedOpen: "visprompt.advancedOpen",
+  promptMode: "visprompt.promptMode",
+  promptFormat: "visprompt.promptFormat"
 };
 
 function readStoredBoolean(key, fallback) {
@@ -75,6 +77,24 @@ function readStoredBoolean(key, fallback) {
 function writeStoredBoolean(key, value) {
   try {
     window.localStorage.setItem(key, String(value));
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
+  }
+}
+
+function readStoredChoice(key, fallback, allowedValues) {
+  try {
+    const value = window.localStorage.getItem(key);
+    if (allowedValues.includes(value)) return value;
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function writeStoredChoice(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
   } catch {
     // localStorage can be unavailable in private or restricted browsing modes.
   }
@@ -148,8 +168,8 @@ function chooseType(typeId) {
   state.selected.clear();
   state.searchQuery = "";
   state.showSelectedOnly = false;
-  state.promptMode = "standard";
-  state.promptFormat = "yaml";
+  state.promptMode = readStoredChoice(storageKeys.promptMode, "standard", ["standard", "short", "detailed"]);
+  state.promptFormat = readStoredChoice(storageKeys.promptFormat, "yaml", ["text", "yaml", "yamlText", "json"]);
   state.advancedOpen = readStoredBoolean(storageKeys.advancedOpen, false);
   elements.subjectInput.value = "";
   elements.negativeInput.value = "";
@@ -603,10 +623,12 @@ elements.subjectInput.addEventListener("input", updatePrompt);
 elements.negativeInput.addEventListener("input", updatePrompt);
 elements.promptMode.addEventListener("change", () => {
   state.promptMode = elements.promptMode.value;
+  writeStoredChoice(storageKeys.promptMode, state.promptMode);
   updatePrompt();
 });
 elements.promptFormat.addEventListener("change", () => {
   state.promptFormat = elements.promptFormat.value;
+  writeStoredChoice(storageKeys.promptFormat, state.promptFormat);
   updatePrompt();
 });
 elements.advancedToggle?.addEventListener("click", () => {
