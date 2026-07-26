@@ -22,6 +22,7 @@ const elements = {
   activeTypeLabel: document.querySelector("#activeTypeLabel"),
   selectionCount: document.querySelector("#selectionCount"),
   mainSelectedChips: document.querySelector("#mainSelectedChips"),
+  selectedSummaryLabel: document.querySelector("#selectedSummaryLabel"),
   selectedOnlyToggle: document.querySelector("#selectedOnlyToggle"),
   clearSelectedButton: document.querySelector("#clearSelectedButton"),
   selectedChips: document.querySelector("#selectedChips"),
@@ -457,6 +458,9 @@ function updatePrompt() {
   const prompt = compilePrompt();
   const count = state.selected.size;
   elements.selectionCount.textContent = count;
+  if (elements.selectedSummaryLabel) {
+    elements.selectedSummaryLabel.textContent = `選択中 ${count}件`;
+  }
   elements.promptOutput.value = prompt;
   elements.charCount.textContent = `${prompt.length}文字`;
   elements.promptFormatLabel.textContent = promptFormatLabels[state.promptFormat];
