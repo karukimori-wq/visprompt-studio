@@ -174,17 +174,22 @@
       }
 
       .selected-summary {
-        margin: -2px 0 14px;
-        padding: 10px 12px;
-        border-radius: 16px;
+        margin: -2px 0 12px;
+        padding: 8px 10px;
+        border-radius: 14px;
       }
 
       .selected-summary-head {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        align-items: center;
       }
 
       .selected-summary-head small {
         display: none;
+      }
+
+      .selected-summary-head span {
+        white-space: nowrap;
       }
 
       .selected-summary-actions {
@@ -361,13 +366,21 @@
         }
 
         .selected-summary {
-          margin: -1px 0 12px;
-          padding: 9px 10px;
-          border-radius: 15px;
+          margin: -1px 0 10px;
+          padding: 8px;
+          border-radius: 14px;
         }
 
         .selected-summary-head {
-          gap: 8px;
+          gap: 6px;
+          margin-bottom: 6px;
+        }
+
+        .selected-only-toggle {
+          min-height: 28px;
+          padding: 0 9px;
+          border-radius: 999px;
+          font-size: 9px;
         }
 
         .builder {
@@ -572,7 +585,7 @@
           <section class="selected-summary" aria-label="選択中のアイテム">
             <div class="selected-summary-head">
               <div>
-                <span>選択中</span>
+                <span id="selectedSummaryLabel">選択中</span>
                 <small>タップで解除</small>
               </div>
               <div class="selected-summary-actions">
