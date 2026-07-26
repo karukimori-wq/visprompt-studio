@@ -36,6 +36,8 @@ const elements = {
   advancedToggle: document.querySelector("#advancedToggle"),
   advancedSummary: document.querySelector("#advancedSummary"),
   itemSearch: document.querySelector("#itemSearch"),
+  itemSearchWrap: document.querySelector("#itemSearchWrap"),
+  searchClearButton: document.querySelector("#searchClearButton"),
   charCount: document.querySelector("#charCount"),
   copyButton: document.querySelector("#copyButton"),
   resetButton: document.querySelector("#resetButton"),
@@ -175,8 +177,15 @@ function chooseCategory(categoryId) {
   state.searchQuery = "";
   state.showSelectedOnly = false;
   elements.itemSearch.value = "";
+  syncSearchControls();
   renderCategories();
   renderGallery();
+}
+
+function syncSearchControls() {
+  const hasQuery = Boolean(state.searchQuery);
+  elements.itemSearchWrap?.classList.toggle("has-value", hasQuery);
+  elements.searchClearButton?.classList.toggle("hidden", !hasQuery);
 }
 
 function renderGallery() {
@@ -518,6 +527,7 @@ function resetSelections() {
   state.searchQuery = "";
   state.showSelectedOnly = false;
   elements.itemSearch.value = "";
+  syncSearchControls();
   elements.negativeInput.value = "";
   if (state.activeType) {
     renderCategories();
@@ -570,14 +580,25 @@ elements.advancedToggle?.addEventListener("click", () => {
 elements.itemSearch.addEventListener("input", () => {
   state.searchQuery = elements.itemSearch.value.trim();
   state.showSelectedOnly = false;
+  syncSearchControls();
   renderGallery();
   updatePrompt();
+});
+elements.searchClearButton?.addEventListener("click", () => {
+  state.searchQuery = "";
+  state.showSelectedOnly = false;
+  elements.itemSearch.value = "";
+  syncSearchControls();
+  renderGallery();
+  updatePrompt();
+  elements.itemSearch.focus();
 });
 elements.categorySelect.addEventListener("change", () => chooseCategory(elements.categorySelect.value));
 elements.selectedOnlyToggle.addEventListener("click", () => {
   if (!state.selected.size) return;
   state.searchQuery = "";
   elements.itemSearch.value = "";
+  syncSearchControls();
   state.showSelectedOnly = !state.showSelectedOnly;
   renderGallery();
   updatePrompt();
