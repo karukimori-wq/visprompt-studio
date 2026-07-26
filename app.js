@@ -57,6 +57,28 @@ const promptFormatLabels = {
 };
 
 const showMappedImages = false;
+const storageKeys = {
+  advancedOpen: "visprompt.advancedOpen"
+};
+
+function readStoredBoolean(key, fallback) {
+  try {
+    const value = window.localStorage.getItem(key);
+    if (value === "true") return true;
+    if (value === "false") return false;
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function writeStoredBoolean(key, value) {
+  try {
+    window.localStorage.setItem(key, String(value));
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
+  }
+}
 
 function escapeHtml(value) {
   return value.replace(/[&<>"']/g, (character) => ({
@@ -128,7 +150,7 @@ function chooseType(typeId) {
   state.showSelectedOnly = false;
   state.promptMode = "standard";
   state.promptFormat = "yaml";
-  state.advancedOpen = false;
+  state.advancedOpen = readStoredBoolean(storageKeys.advancedOpen, false);
   elements.subjectInput.value = "";
   elements.negativeInput.value = "";
   elements.promptMode.value = state.promptMode;
@@ -512,7 +534,8 @@ function syncAdvancedSettings() {
   const formatLabel = elements.promptFormat.selectedOptions[0]?.textContent || "YAML";
   elements.advancedSummary.textContent = `${modeLabel} / ${formatLabel}`;
   elements.advancedToggle.setAttribute("aria-expanded", String(state.advancedOpen));
-  elements.advancedToggle.querySelector(".toggle-icon").textContent = state.advancedOpen ? "⌄" : "⌃";
+  elements.advancedToggle.querySelector("span:first-child").textContent = state.advancedOpen ? "詳細設定を閉じる" : "詳細設定";
+  elements.advancedToggle.querySelector(".toggle-icon").textContent = state.advancedOpen ? "⌃" : "⌄";
   document.body.classList.toggle("advanced-open", state.advancedOpen);
 }
 
@@ -588,6 +611,7 @@ elements.promptFormat.addEventListener("change", () => {
 });
 elements.advancedToggle?.addEventListener("click", () => {
   state.advancedOpen = !state.advancedOpen;
+  writeStoredBoolean(storageKeys.advancedOpen, state.advancedOpen);
   syncAdvancedSettings();
 });
 elements.itemSearch.addEventListener("input", () => {
