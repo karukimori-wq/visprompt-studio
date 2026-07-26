@@ -474,7 +474,11 @@ function updatePrompt() {
   elements.selectedOnlyToggle.disabled = !count;
   elements.clearSelectedButton.disabled = !count;
   elements.selectedOnlyToggle.classList.toggle("active", state.showSelectedOnly);
-  elements.selectedOnlyToggle.textContent = state.showSelectedOnly ? "通常表示に戻る" : "選択済みだけ表示";
+  elements.selectedOnlyToggle.textContent = state.showSelectedOnly ? "通常へ" : "選択だけ";
+  elements.selectedOnlyToggle.setAttribute(
+    "aria-label",
+    state.showSelectedOnly ? "通常表示に戻る" : "選択済みだけ表示"
+  );
 
   renderSelectedChips(elements.mainSelectedChips, "まだ選択されていません");
   renderSelectedChips(elements.selectedChips, "選択したイメージがここに表示されます");
