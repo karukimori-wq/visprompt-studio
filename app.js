@@ -31,6 +31,7 @@ const elements = {
   promptMode: document.querySelector("#promptMode"),
   promptFormat: document.querySelector("#promptFormat"),
   promptFormatLabel: document.querySelector("#promptFormatLabel"),
+  promptMiniMeta: document.querySelector("#promptMiniMeta"),
   advancedToggle: document.querySelector("#advancedToggle"),
   advancedSummary: document.querySelector("#advancedSummary"),
   itemSearch: document.querySelector("#itemSearch"),
@@ -459,6 +460,10 @@ function updatePrompt() {
   elements.promptOutput.value = prompt;
   elements.charCount.textContent = `${prompt.length}文字`;
   elements.promptFormatLabel.textContent = promptFormatLabels[state.promptFormat];
+  if (elements.promptMiniMeta) {
+    const formatLabel = elements.promptFormat.selectedOptions[0]?.textContent || "YAML";
+    elements.promptMiniMeta.textContent = `${count}件 / ${formatLabel}`;
+  }
   syncAdvancedSettings();
   elements.copyButton.disabled = !prompt;
   elements.stepPill.textContent = count || elements.subjectInput.value.trim() ? "STEP 3 / 3" : "STEP 2 / 3";
