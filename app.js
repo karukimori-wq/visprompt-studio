@@ -243,9 +243,12 @@ function renderSearchResults() {
   );
 
   elements.gallery.innerHTML = `
-    <div class="gallery-heading">
-      <h2>「${escapeHtml(state.searchQuery)}」の検索結果</h2>
-      <p>${results.length}件</p>
+    <div class="gallery-heading search-heading">
+      <div>
+        <h2>「${escapeHtml(state.searchQuery)}」の検索結果</h2>
+        <p>${results.length}件</p>
+      </div>
+      <button class="search-return-button" type="button" data-clear-search>検索解除</button>
     </div>
     ${results.length ? `
       <div class="image-grid">
@@ -255,6 +258,16 @@ function renderSearchResults() {
   `;
 
   bindGalleryInteractions();
+  elements.gallery.querySelector("[data-clear-search]")?.addEventListener("click", clearSearch);
+}
+
+function clearSearch() {
+  state.searchQuery = "";
+  state.showSelectedOnly = false;
+  elements.itemSearch.value = "";
+  syncSearchControls();
+  renderGallery();
+  updatePrompt();
 }
 
 function renderSelectedOnlyGallery() {
@@ -585,12 +598,7 @@ elements.itemSearch.addEventListener("input", () => {
   updatePrompt();
 });
 elements.searchClearButton?.addEventListener("click", () => {
-  state.searchQuery = "";
-  state.showSelectedOnly = false;
-  elements.itemSearch.value = "";
-  syncSearchControls();
-  renderGallery();
-  updatePrompt();
+  clearSearch();
   elements.itemSearch.focus();
 });
 elements.categorySelect.addEventListener("change", () => chooseCategory(elements.categorySelect.value));
