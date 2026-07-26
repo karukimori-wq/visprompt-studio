@@ -168,6 +168,11 @@
         color: #fff;
       }
 
+      .choice-button:focus-visible {
+        outline: 3px solid rgba(101, 88, 245, 0.25);
+        outline-offset: 2px;
+      }
+
       .selected-summary {
         margin: -2px 0 14px;
         padding: 10px 12px;
@@ -308,9 +313,10 @@
         }
 
         .prompt-options.enhanced {
-          margin: 14px 0 12px;
-          padding: 9px 10px;
-          border-radius: 16px;
+          gap: 6px;
+          margin: 12px 0 10px;
+          padding: 8px;
+          border-radius: 14px;
         }
 
         body:not(.advanced-open) .negative-field,
@@ -330,12 +336,12 @@
         }
 
         .choice-field {
-          grid-template-columns: 60px minmax(0, 1fr);
-          gap: 8px;
+          grid-template-columns: 42px minmax(0, 1fr);
+          gap: 6px;
         }
 
         .choice-title {
-          font-size: 12px;
+          font-size: 11px;
         }
 
         .choice-grid,
@@ -345,13 +351,13 @@
         }
 
         .choice-button {
-          min-height: 32px;
-          padding: 0 11px;
+          min-height: 29px;
+          padding: 0 10px;
           border-radius: 999px;
         }
 
         .choice-button strong {
-          font-size: 12px;
+          font-size: 11px;
         }
 
         .selected-summary {
@@ -663,6 +669,13 @@
             const active = button.dataset.selectValue === select.value;
             button.classList.toggle("active", active);
             button.setAttribute("aria-pressed", String(active));
+            if (active) {
+              button.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "nearest"
+              });
+            }
           });
         }
 
