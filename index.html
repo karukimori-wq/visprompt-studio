@@ -134,6 +134,13 @@
         display: none;
       }
 
+      .choice-grid,
+      .category-tabs,
+      .selected-summary-actions,
+      .selected-chips.inline {
+        overscroll-behavior-inline: contain;
+      }
+
       .choice-button {
         display: inline-flex;
         flex: 0 0 auto;
@@ -493,6 +500,7 @@
           background: rgba(255, 255, 255, 0.94);
           border-bottom: 1px solid rgba(232, 230, 238, 0.85);
           backdrop-filter: blur(14px);
+          mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 36px), transparent 100%);
         }
 
         .category-tabs::-webkit-scrollbar {
