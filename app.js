@@ -60,7 +60,8 @@ const showMappedImages = false;
 const storageKeys = {
   advancedOpen: "visprompt.advancedOpen",
   promptMode: "visprompt.promptMode",
-  promptFormat: "visprompt.promptFormat"
+  promptFormat: "visprompt.promptFormat",
+  draftPrefix: "visprompt.draft."
 };
 
 function readStoredBoolean(key, fallback) {
@@ -95,6 +96,43 @@ function readStoredChoice(key, fallback, allowedValues) {
 function writeStoredChoice(key, value) {
   try {
     window.localStorage.setItem(key, value);
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
+  }
+}
+
+function draftKey(typeId) {
+  return `${storageKeys.draftPrefix}${typeId}`;
+}
+
+function readDraft(typeId) {
+  try {
+    const raw = window.localStorage.getItem(draftKey(typeId));
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft() {
+  if (!state.activeType) return;
+  const draft = {
+    activeCategory: state.activeCategory,
+    subject: elements.subjectInput.value,
+    negative: elements.negativeInput.value,
+    selectedIds: [...state.selected.keys()],
+    updatedAt: Date.now()
+  };
+  try {
+    window.localStorage.setItem(draftKey(state.activeType.id), JSON.stringify(draft));
+  } catch {
+    // localStorage can be unavailable in private or restricted browsing modes.
+  }
+}
+
+function clearDraft(typeId) {
+  try {
+    window.localStorage.removeItem(draftKey(typeId));
   } catch {
     // localStorage can be unavailable in private or restricted browsing modes.
   }
@@ -162,20 +200,28 @@ function renderTypes() {
 }
 
 function chooseType(typeId) {
+  const draft = readDraft(typeId);
   state.activeType = VIS_PROMPT_TYPES.find((type) => type.id === typeId);
   if (!state.activeType?.categories.length) return;
-  state.activeCategory = state.activeType.categories[0].id;
+  const draftCategoryExists = state.activeType.categories.some((category) => category.id === draft?.activeCategory);
+  state.activeCategory = draftCategoryExists ? draft.activeCategory : state.activeType.categories[0].id;
   state.selected.clear();
   state.searchQuery = "";
   state.showSelectedOnly = false;
   state.promptMode = readStoredChoice(storageKeys.promptMode, "standard", ["standard", "short", "detailed"]);
   state.promptFormat = readStoredChoice(storageKeys.promptFormat, "yaml", ["text", "yaml", "yamlText", "json"]);
   state.advancedOpen = readStoredBoolean(storageKeys.advancedOpen, false);
-  elements.subjectInput.value = "";
-  elements.negativeInput.value = "";
+  elements.subjectInput.value = typeof draft?.subject === "string" ? draft.subject : "";
+  elements.negativeInput.value = typeof draft?.negative === "string" ? draft.negative : "";
   elements.promptMode.value = state.promptMode;
   elements.promptFormat.value = state.promptFormat;
   elements.itemSearch.value = "";
+  if (Array.isArray(draft?.selectedIds)) {
+    draft.selectedIds.forEach((itemId) => {
+      const item = findItem(itemId);
+      if (item) state.selected.set(itemId, item);
+    });
+  }
   elements.typeSection.classList.add("hidden");
   elements.builderSection.classList.remove("hidden");
   elements.activeTypeLabel.textContent = state.activeType.name.toUpperCase();
@@ -222,6 +268,7 @@ function chooseCategory(categoryId) {
   syncSearchControls();
   renderCategories();
   renderGallery();
+  saveDraft();
 }
 
 function syncSearchControls() {
@@ -546,6 +593,7 @@ function updatePrompt() {
 
   renderSelectedChips(elements.mainSelectedChips, "まだ選択されていません");
   renderSelectedChips(elements.selectedChips, "選択したイメージがここに表示されます");
+  saveDraft();
 }
 
 function syncAdvancedSettings() {
@@ -578,6 +626,7 @@ function renderSelectedChips(container, emptyMessage) {
 }
 
 function resetSelections() {
+  const currentTypeId = state.activeType?.id;
   state.selected.clear();
   elements.subjectInput.value = "";
   state.searchQuery = "";
@@ -585,6 +634,7 @@ function resetSelections() {
   elements.itemSearch.value = "";
   syncSearchControls();
   elements.negativeInput.value = "";
+  if (currentTypeId) clearDraft(currentTypeId);
   if (state.activeType) {
     renderCategories();
     renderGallery();
