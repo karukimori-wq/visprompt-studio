@@ -228,6 +228,20 @@
         flex: 0 0 auto;
       }
 
+      .selected-more {
+        flex: 0 0 auto;
+        height: 34px;
+        padding: 0 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
       .advanced-toggle {
         width: 100%;
         min-height: 42px;
@@ -645,6 +659,9 @@
                 <small>タップで解除</small>
               </div>
               <div class="selected-summary-actions">
+                <button class="selected-only-toggle" id="selectedSummaryToggle" type="button" aria-label="選択中アイテムをすべて表示" title="選択中アイテムをすべて表示" hidden>
+                  すべて表示
+                </button>
                 <button class="selected-only-toggle" id="selectedOnlyToggle" type="button" aria-label="選択済みだけ表示" title="選択済みだけ表示" disabled>
                   選択だけ
                 </button>
