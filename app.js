@@ -9,7 +9,8 @@ const state = {
   promptMode: "standard",
   promptFormat: "yaml",
   promptExpanded: true,
-  advancedOpen: false
+  advancedOpen: false,
+  selectedSummaryExpanded: false
 };
 
 const elements = {
@@ -23,6 +24,7 @@ const elements = {
   selectionCount: document.querySelector("#selectionCount"),
   mainSelectedChips: document.querySelector("#mainSelectedChips"),
   selectedSummaryLabel: document.querySelector("#selectedSummaryLabel"),
+  selectedSummaryToggle: document.querySelector("#selectedSummaryToggle"),
   selectedOnlyToggle: document.querySelector("#selectedOnlyToggle"),
   clearSelectedButton: document.querySelector("#clearSelectedButton"),
   selectedChips: document.querySelector("#selectedChips"),
@@ -206,6 +208,7 @@ function chooseType(typeId) {
   const draftCategoryExists = state.activeType.categories.some((category) => category.id === draft?.activeCategory);
   state.activeCategory = draftCategoryExists ? draft.activeCategory : state.activeType.categories[0].id;
   state.selected.clear();
+  state.selectedSummaryExpanded = false;
   state.searchQuery = "";
   state.showSelectedOnly = false;
   state.promptMode = readStoredChoice(storageKeys.promptMode, "standard", ["standard", "short", "detailed"]);
@@ -408,6 +411,7 @@ function toggleItem(itemId) {
 
 function clearSelectedItems() {
   state.selected.clear();
+  state.selectedSummaryExpanded = false;
   state.showSelectedOnly = false;
   renderCategories();
   renderGallery();
@@ -572,6 +576,15 @@ function updatePrompt() {
   if (elements.selectedSummaryLabel) {
     elements.selectedSummaryLabel.textContent = `選択中 ${count}件`;
   }
+  if (elements.selectedSummaryToggle) {
+    const canExpand = count > 5;
+    elements.selectedSummaryToggle.hidden = !canExpand;
+    elements.selectedSummaryToggle.textContent = state.selectedSummaryExpanded ? "折りたたむ" : "すべて表示";
+    elements.selectedSummaryToggle.setAttribute(
+      "aria-label",
+      state.selectedSummaryExpanded ? "選択中アイテムを折りたたむ" : `選択中アイテムをすべて表示する、残り${Math.max(count - 5, 0)}件`
+    );
+  }
   elements.promptOutput.value = prompt;
   elements.charCount.textContent = `${prompt.length}文字`;
   elements.promptFormatLabel.textContent = promptFormatLabels[state.promptFormat];
@@ -614,11 +627,19 @@ function renderSelectedChips(container, emptyMessage) {
     return;
   }
 
-  container.innerHTML = [...state.selected.values()].map((item) => `
-    <button type="button" class="selected-chip" data-remove="${item.id}" title="選択解除">
-      ${item.label}<span>×</span>
-    </button>
-  `).join("");
+  const isMainSummary = container === elements.mainSelectedChips;
+  const items = [...state.selected.values()];
+  const visibleItems = isMainSummary && !state.selectedSummaryExpanded ? items.slice(0, 5) : items;
+  const hiddenCount = isMainSummary && !state.selectedSummaryExpanded ? Math.max(items.length - visibleItems.length, 0) : 0;
+
+  container.innerHTML = [
+    ...visibleItems.map((item) => `
+      <button type="button" class="selected-chip" data-remove="${item.id}" title="選択解除">
+        ${item.label}<span>×</span>
+      </button>
+    `),
+    hiddenCount ? `<span class="selected-more">+${hiddenCount}</span>` : ""
+  ].join("");
 
   container.querySelectorAll("[data-remove]").forEach((button) => {
     button.addEventListener("click", () => toggleItem(button.dataset.remove));
@@ -705,6 +726,10 @@ elements.selectedOnlyToggle.addEventListener("click", () => {
   syncSearchControls();
   state.showSelectedOnly = !state.showSelectedOnly;
   renderGallery();
+  updatePrompt();
+});
+elements.selectedSummaryToggle?.addEventListener("click", () => {
+  state.selectedSummaryExpanded = !state.selectedSummaryExpanded;
   updatePrompt();
 });
 elements.clearSelectedButton.addEventListener("click", () => {
