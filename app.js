@@ -362,12 +362,21 @@ function clearSearch() {
   updatePrompt();
 }
 
+function showAllItems() {
+  state.showSelectedOnly = false;
+  renderGallery();
+  updatePrompt();
+}
+
 function renderSelectedOnlyGallery() {
   const selections = [...state.selected.values()];
   elements.gallery.innerHTML = `
-    <div class="gallery-heading">
-      <h2>選択済みアイテム</h2>
-      <p>${selections.length}件 ・ タップで解除</p>
+    <div class="gallery-heading search-heading">
+      <div>
+        <h2>選択済みアイテム</h2>
+        <p>${selections.length}件 ・ タップで解除</p>
+      </div>
+      <button class="search-return-button" type="button" data-show-all-items>通常表示へ</button>
     </div>
     ${selections.length ? `
       <div class="image-grid">
@@ -377,6 +386,7 @@ function renderSelectedOnlyGallery() {
   `;
 
   bindGalleryInteractions();
+  elements.gallery.querySelector("[data-show-all-items]")?.addEventListener("click", showAllItems);
 }
 
 function bindGalleryInteractions() {
