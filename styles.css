@@ -523,8 +523,8 @@ button { color: inherit; }
 .prompt-panel-actions { display: flex; align-items: center; gap: 10px; }
 .panel-kicker { color: var(--accent); font-size: 9px; font-weight: 700; letter-spacing: .16em; }
 .prompt-panel h2 { margin: 4px 0 0; font-size: 21px; }
-.live-dot { color: #3b8d59; font-size: 10px; }
-.live-dot::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #52c77b; }
+.live-dot { color: var(--accent-dark); font-size: 10px; }
+.live-dot::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--accent); }
 .prompt-toggle {
   min-width: 62px;
   height: 34px;
@@ -669,34 +669,29 @@ button { color: inherit; }
     border-radius: 22px 22px 0 0;
     box-shadow: 0 -15px 40px rgba(31,25,77,.13);
   }
-  body.prompt-collapsed .builder { padding-bottom: 118px; }
+  body.prompt-collapsed .builder { padding-bottom: 88px; }
   .prompt-panel.collapsed {
     left: 16px;
     right: 16px;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    padding: 13px 14px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    padding: 8px 9px 8px 14px;
     border: 1px solid var(--line);
-    border-radius: 17px;
+    border-radius: 999px;
     box-shadow: 0 10px 30px rgba(31,25,77,.16);
   }
-  .prompt-panel.collapsed .prompt-panel-head { width: 100%; }
+  .prompt-panel.collapsed .prompt-panel-head {
+    width: 100%;
+    gap: 10px;
+  }
   .prompt-panel.collapsed .prompt-toggle {
-    min-width: 142px;
-    height: 40px;
+    min-width: 124px;
+    height: 36px;
     border: 0;
+    border-radius: 999px;
     background: var(--accent);
     color: white;
   }
-  .prompt-panel.collapsed h2::after {
-    content: "";
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    margin-left: 8px;
-    border-radius: 50%;
-    background: #52c77b;
-    vertical-align: middle;
-  }
+  .prompt-panel.collapsed h2 { font-size: 13px; }
   .prompt-panel-head h2 { font-size: 17px; }
   .selected-chips { min-height: 36px; margin: 11px 0 8px; }
   .prompt-box textarea { min-height: 76px; height: 76px; padding: 11px; font-size: 11px; line-height: 1.6; }
